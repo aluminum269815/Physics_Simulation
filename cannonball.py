@@ -1,3 +1,5 @@
+import math
+
 class CannonBall:
     def __init__(self):
         self.time_after_firing = 0
@@ -11,8 +13,8 @@ class CannonBall:
         self.initial_horizontal_velocity = 20
         self.initial_vertical_velocity = 20
 
-        self.initial_kinetic_energy = 0.5 * self.mass * self.initial_total_velocity ** 2
-        self.initial_gravitational_potential_energy = 9.8 * self.mass * self.initial_height
+        self.initial_kinetic_energy = round(0.5 * self.mass * self.initial_total_velocity ** 2, 0)
+        self.initial_gravitational_potential_energy = round(9.8 * self.mass * self.initial_height, 0)
         self.initial_total_energy = self.initial_kinetic_energy + self.initial_gravitational_potential_energy
 
         self.current_distance = 0
@@ -32,6 +34,8 @@ class CannonBall:
         self.current_total_energy = 0
         self.energy_loss = 0
 
+        self.update_data()
+
     def update(self):
         self.update_data()
 
@@ -42,13 +46,39 @@ class CannonBall:
         self.update_energy()
 
     def update_position(self):
-        pass
+        self.current_distance = round(self.initial_horizontal_velocity * self.time_after_firing, 3)
+        self.current_height = round(self.initial_height + self.time_after_firing * self.initial_vertical_velocity \
+                              - 4.9 * self.time_after_firing ** 2, 3)
 
     def update_velocity(self):
-        pass
+        self.current_horizontal_velocity = self.initial_horizontal_velocity
+        self.current_vertical_velocity = round(self.initial_vertical_velocity - 9.8 * self.time_after_firing, 3)
+
+        self.current_total_velocity = round(math.sqrt(self.current_horizontal_velocity ** 2 \
+                                                    + self.current_vertical_velocity ** 2), 3)
+        self.current_moving_direction = round(math.degrees(math.atan2(self.current_vertical_velocity,
+                                                         self.current_horizontal_velocity)), 3)
 
     def update_acceleration(self):
-        pass
+        self.current_horizontal_acceleration = 0
+        self.current_vertical_acceleration = -9.8
+
+        self.current_total_acceleration = round(math.sqrt(self.current_horizontal_acceleration ** 2 \
+                                                    + self.current_vertical_acceleration ** 2), 3)
+        self.current_acceleration_direction = round(math.degrees(math.atan2(self.current_vertical_acceleration,
+                                                         self.current_horizontal_acceleration)), 3)
 
     def update_energy(self):
-        pass
+        self.current_kinetic_energy = round(0.5 * self.mass * self.current_total_velocity ** 2, 0)
+        self.current_gravitational_potential_energy = round(9.8 * self.mass * self.current_height, 0)
+        self.current_total_energy = round(self.current_kinetic_energy + self.current_gravitational_potential_energy, 0)
+        self.energy_loss = round(self.initial_total_energy - self.current_total_energy, 0)
+
+    def test(self, time):
+        self.time_after_firing = time
+        self.update_data()
+        for key, value in vars(self).items():
+            print(f"{key}: {value}")
+
+a = CannonBall()
+a.test(3.5)
