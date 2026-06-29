@@ -13,8 +13,10 @@ class CannonBall:
         self.initial_height = settings.cannon_height
         self.initial_total_velocity = settings.initial_cannon_velocity
         self.initial_moving_direction = settings.firing_angle
-        self.initial_horizontal_velocity = round(self.initial_height * math.cos(self.initial_moving_direction), 3)
-        self.initial_vertical_velocity = round(self.initial_height * math.sin(self.initial_moving_direction), 3)
+        self.initial_horizontal_velocity = \
+            round(self.initial_total_velocity * math.cos(math.radians(self.initial_moving_direction)), 3)
+        self.initial_vertical_velocity = \
+            round(self.initial_total_velocity * math.sin(math.radians(self.initial_moving_direction)), 3)
 
         self.initial_kinetic_energy = round(0.5 * self.mass * self.initial_total_velocity ** 2, 0)
         self.initial_gravitational_potential_energy = round(9.8 * self.mass * self.initial_height, 0)
