@@ -76,12 +76,3 @@ class CannonBall:
         self.current_gravitational_potential_energy = round(9.8 * self.mass * self.current_height, 0)
         self.current_total_energy = round(self.current_kinetic_energy + self.current_gravitational_potential_energy, 0)
         self.energy_loss = round(self.initial_total_energy - self.current_total_energy, 0)
-
-    def test(self, time):
-        self.time_after_firing = time
-        self.update_data()
-        for key, value in vars(self).items():
-            print(f"{key}: {value}")
-
-a = CannonBall()
-a.test(7)
