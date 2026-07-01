@@ -1,24 +1,32 @@
-import sys
+import os, sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 
 from settings import Settings
 
 
-class Program(QWidget):
+class Program:
+    def __init__(self):
+        self.settings = Settings()
+        self.app = QApplication(sys.argv)
+        self.window = Window()
+
+    def run(self):
+        self.window.show()
+        sys.exit(self.app.exec_())
+
+
+class Window(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Projectile Motion sim")
-        self.background = QPixmap("H:/Untitled design.png")
+        self.background = QPixmap(os.path.abspath("asset/background.png"))
         self.resize(800, 500)
-        self.settings = Settings()
 
     def paintEvent(self, event):
         painter = QPainter(self)
         scaled = self.background.scaled(self.size(), aspectRatioMode=2)
         painter.drawPixmap(0, 0, scaled)
 
-app = QApplication(sys.argv)
-window = Program()
-window.show()
-sys.exit(app.exec_())
+program = Program()
+program.run()
