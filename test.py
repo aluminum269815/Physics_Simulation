@@ -8,6 +8,7 @@ def test(cannonball, time):
     cannonball.time_after_firing = time
     cannonball.update_data()
     for key, value in vars(cannonball).items():
-        print(f"{key}: {value}")
+        if key not in ('data_lists', 'time_index', 'gravity', 'air_resistance_enabled', 'air_density'):
+            print(f"{key}: {value}")
 
-test(test_cannonball, 7)
+test(test_cannonball, 3)
