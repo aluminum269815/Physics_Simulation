@@ -129,7 +129,6 @@ def paintEvent(self, event):
     painter = QPainter(self)
     scaled = self.background.scaled(self.size(), aspectRatioMode=2)
     painter.drawPixmap(0, 0, scaled)
-```
 
 program = Program()
 program.run()
