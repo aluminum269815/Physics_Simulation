@@ -3,9 +3,10 @@ from constants import *
 
 class Settings:
     def __init__(self):
-        self.gravitational_acceleration = DEFAULT_GRAVITATIONAL_ACCELERATION
-        self.air_resistance_activity = False
+        self.gravity = DEFAULT_GRAVITY
+        self.air_resistance_enabled = False
         self.air_density = DEFAULT_AIR_DENSITY
+        self.drag_coefficient = DEFAULT_DRAG_COEFFICIENT
 
         self.cannon_height = DEFAULT_CANNON_HEIGHT
         self.firing_angle = DEFAULT_FIRING_ANGLE
