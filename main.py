@@ -124,22 +124,12 @@ class Program(QWidget):
         self.settings_window = CannonballDetails(self)
         self.settings_window.show()
 
-    def change_air_density_size(self, value):
-        print("Air density:", value)
-
-    def change_gravity_size(self, value):
-        print("Gravity:", value)
 
     def paintEvent(self, event):
         painter = QPainter(self)
         scaled = self.background.scaled(self.size(), aspectRatioMode=2)
         painter.drawPixmap(0, 0, scaled)
 
-    def check_air_resistance(self,state):
-        if state == Qt.Checked:
-            self.air_resistance_check.setText("Air resistance is on")
-        else:
-            self.air_resistance_check.setText("Air resistance is off")
 
 
 
