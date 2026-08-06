@@ -6,130 +6,144 @@ from PyQt5.QtCore import *
 
 from settings import Settings
 from basicparameters import BasicParameters
+from visualdisplay import VisualDisplay
+from cannonsettings import CannonSettings
+from cannonballdetails import CannonballDetails
+class Program(QWidget):
+    def __init__(self):
+        super().__init__()
 
-class Program:
-def **init**(self):
-self.settings = Settings()
-self.app = QApplication(sys.argv)
-self.window = Window()
+        self.setWindowTitle("Projectile Motion sim")
+        self.background = QPixmap(os.path.abspath("asset/background.png"))
+        self.resize(800, 500)
 
-```
-def run(self):
-    self.window.show()
-    sys.exit(self.app.exec_())
-```
+        self.settings = Settings()
+        self.settings_window = None
 
-class Window(QWidget):
-def **init**(self):
-super().**init**()
+        self.settings_panel = QPushButton("⚙ Settings    ▼")
+        self.settings_panel.clicked.connect(self.toggle_settings)
 
-```
-    self.setWindowTitle("Projectile Motion sim")
-    self.background = QPixmap(os.path.abspath("asset/background.png"))
-    self.resize(800, 500)
+        self.settings_panel.setFixedSize(150, 40)
 
-    self.settings = Settings()
-    self.settings_window = None
+        self.settings_menu = QFrame()
 
-    self.settings_panel = QPushButton("⚙ Settings    ▼")
-    self.settings_panel.clicked.connect(self.toggle_settings)
+        self.settings_menu.setStyleSheet("""
+            QFrame {
+                background-color: #c2c1c2;
+                border: 1px solid #cccccc;
+                border-radius: 8px;
+            }
+    
+            QPushButton {
+                background-color: #c2c1c2;
+                color: black;
+                border: grey;
+                padding: 8px;
+                text-align: left;
+                border-radius: 4px;
+            }
+    
+            QPushButton:hover {
+                background-color: #eeeeee;
+            }
+        """)
 
-    self.settings_panel.setFixedSize(150, 40)
+        settings_layout = QVBoxLayout()
 
-    self.settings_menu = QFrame()
+        settings_layout.setContentsMargins(8, 8, 8, 8)
+        settings_layout.setSpacing(4)
 
-    self.settings_menu.setStyleSheet("""
-        QFrame {
-            background-color: #c2c1c2;
-            border: 1px solid #cccccc;
-            border-radius: 8px;
-        }
+        self.settings_menu.setLayout(settings_layout)
 
-        QPushButton {
-            background-color: #c2c1c2;
-            color: black;
-            border: grey;
-            padding: 8px;
-            text-align: left;
-            border-radius: 4px;
-        }
+        self.basic_parameters_button = QPushButton("Basic Parameters")
+        self.visual_display_button = QPushButton("Visual Displays")
+        self.cannon_settings_button = QPushButton("Cannon Settings")
+        self.cannonball_details_button = QPushButton("Cannonball Details")
 
-        QPushButton:hover {
-            background-color: #eeeeee;
-        }
-    """)
+        settings_layout.addWidget(self.basic_parameters_button)
+        settings_layout.addWidget(self.visual_display_button)
+        settings_layout.addWidget(self.cannon_settings_button)
+        settings_layout.addWidget(self.cannonball_details_button)
 
-    settings_layout = QVBoxLayout()
+        self.basic_parameters_button.clicked.connect(self.unfold_basic_parameters)
+        self.visual_display_button.clicked.connect(self.unfold_visual_display)
+        self.cannon_settings_button.clicked.connect(self.unfold_cannon_settings)
+        self.cannonball_details_button.clicked.connect(self.unfold_cannonball_details)
 
-    settings_layout.setContentsMargins(8, 8, 8, 8)
-    settings_layout.setSpacing(4)
+        self.settings_menu.setVisible(False)
 
-    self.settings_menu.setLayout(settings_layout)
+        self.settings_container = QWidget()
 
-    self.basic_parameters_button = QPushButton("Basic Parameters")
-    self.visual_display_button = QPushButton("Visual Displays")
-    self.cannon_settings_button = QPushButton("Cannon Settings")
-    self.cannonball_details_button = QPushButton("Cannonball Details")
+        settings_container_layout = QVBoxLayout()
 
-    settings_layout.addWidget(self.basic_parameters_button)
-    settings_layout.addWidget(self.visual_display_button)
-    settings_layout.addWidget(self.cannon_settings_button)
-    settings_layout.addWidget(self.cannonball_details_button)
+        settings_container_layout.setContentsMargins(0, 15, 20, 0)
+        settings_container_layout.setSpacing(5)
+        settings_container_layout.setAlignment(Qt.AlignTop | Qt.AlignRight)
 
-    self.basic_parameters_button.clicked.connect(self.unfold_settings_panel)
+        settings_container_layout.addWidget(self.settings_panel)
+        settings_container_layout.addWidget(self.settings_menu)
 
-    self.settings_menu.setVisible(False)
+        self.settings_container.setLayout(settings_container_layout)
 
-    self.settings_container = QWidget()
+        layout = QVBoxLayout()
 
-    settings_container_layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
 
-    settings_container_layout.setContentsMargins(0, 15, 20, 0)
-    settings_container_layout.setSpacing(5)
-    settings_container_layout.setAlignment(Qt.AlignTop | Qt.AlignRight)
+        layout.addWidget(self.settings_container)
 
-    settings_container_layout.addWidget(self.settings_panel)
-    settings_container_layout.addWidget(self.settings_menu)
+        layout.addStretch()
 
-    self.settings_container.setLayout(settings_container_layout)
+        layout.addStretch()
 
-    layout = QVBoxLayout()
+        self.setLayout(layout)
 
-    layout.setContentsMargins(0, 0, 0, 0)
 
-    layout.addWidget(self.settings_container)
+    def toggle_settings(self):
+        is_visible = self.settings_menu.isVisible()
 
-    layout.addStretch()
+        self.settings_menu.setVisible(not is_visible)
 
-    layout.addStretch()
+        if is_visible:
+            self.settings_panel.setText("⚙ Settings    ▶")
+        else:
+            self.settings_panel.setText("⚙ Settings    ▼")
 
-    self.setLayout(layout)
+    def unfold_basic_parameters(self):
+        self.settings_window = BasicParameters(self)
+        self.settings_window.show()
 
-def toggle_settings(self):
-    is_visible = self.settings_menu.isVisible()
+    def unfold_visual_display(self):
+        self.settings_window = VisualDisplay(self)
+        self.settings_window.show()
 
-    self.settings_menu.setVisible(not is_visible)
+    def unfold_cannon_settings(self):
+        self.settings_window = CannonSettings(self)
+        self.settings_window.show()
 
-    if is_visible:
-        self.settings_panel.setText("⚙ Settings    ▶")
-    else:
-        self.settings_panel.setText("⚙ Settings    ▼")
+    def unfold_cannonball_details(self):
+        self.settings_window = CannonballDetails(self)
+        self.settings_window.show()
 
-def unfold_settings_panel(self):
-    self.settings_window = BasicParameters(self)
-    self.settings_window.show()
+    def change_air_density_size(self, value):
+        print("Air density:", value)
 
-def change_air_density_size(self, value):
-    print("Air density:", value)
+    def change_gravity_size(self, value):
+        print("Gravity:", value)
 
-def change_gravity_size(self, value):
-    print("Gravity:", value)
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        scaled = self.background.scaled(self.size(), aspectRatioMode=2)
+        painter.drawPixmap(0, 0, scaled)
 
-def paintEvent(self, event):
-    painter = QPainter(self)
-    scaled = self.background.scaled(self.size(), aspectRatioMode=2)
-    painter.drawPixmap(0, 0, scaled)
-```
+    def check_air_resistance(self,state):
+        if state == Qt.Checked:
+            self.air_resistance_check.setText("Air resistance is on")
+        else:
+            self.air_resistance_check.setText("Air resistance is off")
 
-program = Program()
-program.run()
+
+
+app = QApplication(sys.argv)
+window = Program()
+window.show()
+sys.exit(app.exec_())

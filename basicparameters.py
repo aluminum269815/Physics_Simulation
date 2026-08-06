@@ -12,6 +12,10 @@ class BasicParameters(QWidget):
         self.setWindowTitle("Basic Parameters")
         self.setFixedSize(350, 250)
 
+        air_resistance_label = QLabel("Air resistance")
+
+        self.air_resistance_checkbox = QCheckBox()
+
         air_density_label= QLabel("Air Density")
 
         self.air_density_slider = QSlider(Qt.Horizontal)
@@ -42,6 +46,14 @@ class BasicParameters(QWidget):
 
         layout = QVBoxLayout()
 
+        air_resistance_row = QHBoxLayout()
+        air_resistance_row.addWidget(air_resistance_label)
+        air_resistance_row.addWidget(self.air_resistance_checkbox)
+        air_resistance_row.addStretch()
+
+        layout.addLayout(air_resistance_row)
+
+
         layout.addWidget(air_density_label)
 
         air_density_row = QHBoxLayout()
@@ -57,6 +69,7 @@ class BasicParameters(QWidget):
         gravity_row.addWidget(self.gravity_input)
 
         layout.addLayout(gravity_row)
+
 
         self.setLayout(layout)
 
