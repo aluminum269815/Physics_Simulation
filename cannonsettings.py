@@ -10,3 +10,5 @@ class CannonSettings(QWidget):
         self.main_window = main_window
         self.setWindowTitle("Cannon Settings")
         self.setFixedSize(350, 250)
+
+

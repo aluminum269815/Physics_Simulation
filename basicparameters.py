@@ -20,7 +20,7 @@ class BasicParameters(QWidget):
 
         self.air_density_slider = QSlider(Qt.Horizontal)
         self.air_density_slider.setMinimum(0)
-        self.air_density_slider.setMaximum(60000)
+        self.air_density_slider.setMaximum(100000)
         self.air_density_slider.setValue(1225)
 
         self.air_density_input = QLineEdit()
