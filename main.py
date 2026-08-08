@@ -15,7 +15,7 @@ class Program(QWidget):
 
         self.setWindowTitle("Projectile Motion sim")
         self.background = QPixmap(os.path.abspath("asset/background.png"))
-        self.resize(800, 500)
+        self.resize(700, 500)
 
         self.settings = Settings()
         self.settings_window = None
@@ -45,6 +45,7 @@ class Program(QWidget):
     
             QPushButton:hover {
                 background-color: #eeeeee;
+                font-family: Arial;
             }
         """)
 
@@ -124,6 +125,26 @@ class Program(QWidget):
         self.settings_window = CannonballDetails(self)
         self.settings_window.show()
 
+    def change_air_density_size(self,value):
+        print("air density:", value)
+
+    def change_gravity_size(self,value):
+        print("gravity:", value)
+
+    def change_initial_velocity_size(self, value):
+        print("Initial velocity:", value)
+
+    def change_cannonball_mass_size(self, value):
+        print("Cannonball mass:", value)
+
+    def change_cannon_height_size(self, value):
+        print("Cannon height:", value)
+
+    def change_cannonball_radius_size(self, value):
+        print("Cannonball radius:", value)
+
+    def change_firing_angle_size(self, value):
+        print("Firing angle:", value)
 
     def paintEvent(self, event):
         painter = QPainter(self)
