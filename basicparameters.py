@@ -25,6 +25,7 @@ class BasicParameters(QWidget):
         self.air_density_input = QLineEdit()
         self.air_density_input.setText("1.225")
         self.air_density_input.setFixedWidth(60)
+        air_density_unit_label = QLabel("kg/m<sup>-3<sup>")
 
         self.air_density_input.editingFinished.connect(self.change_air_density)
         self.air_density_slider.valueChanged.connect(self.update_air_density)
@@ -39,6 +40,7 @@ class BasicParameters(QWidget):
         self.gravity_input = QLineEdit()
         self.gravity_input.setText("9.81")
         self.gravity_input.setFixedWidth(60)
+        gravity_unit_label = QLabel("m/s<sup>-2<sup> ")
 
         self.gravity_input.editingFinished.connect(self.change_gravity)
         self.gravity_slider.valueChanged.connect(self.update_gravity)
@@ -58,6 +60,7 @@ class BasicParameters(QWidget):
         air_density_row = QHBoxLayout()
         air_density_row.addWidget(self.air_density_slider)
         air_density_row.addWidget(self.air_density_input)
+        air_density_row.addWidget(air_density_unit_label)
 
         layout.addLayout(air_density_row)
 
@@ -66,6 +69,7 @@ class BasicParameters(QWidget):
         gravity_row = QHBoxLayout()
         gravity_row.addWidget(self.gravity_slider)
         gravity_row.addWidget(self.gravity_input)
+        gravity_row.addWidget(gravity_unit_label)
 
         layout.addLayout(gravity_row)
 

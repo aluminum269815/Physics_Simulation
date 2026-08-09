@@ -126,33 +126,30 @@ class Program(QWidget):
         self.settings_window.show()
 
     def change_air_density_size(self,value):
-        print("air density:", value)
+        print("air density:", value, "kg/m<sup>-3<sup>")
 
     def change_gravity_size(self,value):
-        print("gravity:", value)
+        print("gravity:", value, "m/s<sup>-2<sup>")
 
     def change_initial_velocity_size(self, value):
-        print("Initial velocity:", value)
+        print("Initial velocity:", value, "m/s<sup>-1<sup>")
 
     def change_cannonball_mass_size(self, value):
-        print("Cannonball mass:", value)
+        print("Cannonball mass:", value, "kg")
 
     def change_cannon_height_size(self, value):
-        print("Cannon height:", value)
+        print("Cannon height:", value, "m")
 
     def change_cannonball_radius_size(self, value):
-        print("Cannonball radius:", value)
+        print("Cannonball radius:", value, "cm")
 
     def change_firing_angle_size(self, value):
-        print("Firing angle:", value)
+        print("Firing angle:", value, "\u00B0")
 
     def paintEvent(self, event):
         painter = QPainter(self)
-        scaled = self.background.scaled(self.size(), aspectRatioMode=2)
+        scaled = self.background.scaled(self.size(),Qt.KeepAspectRatio)
         painter.drawPixmap(0, 0, scaled)
-
-
-
 
 app = QApplication(sys.argv)
 window = Program()

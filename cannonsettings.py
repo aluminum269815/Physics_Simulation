@@ -60,7 +60,7 @@ class CannonSettings(QWidget):
 
         self.firing_angle_slider = QSlider(Qt.Horizontal)
         self.firing_angle_slider.setMinimum(0)
-        self.firing_angle_slider.setMaximum(100000)
+        self.firing_angle_slider.setMaximum(80000)
         self.firing_angle_slider.setValue(0)
 
         self.firing_angle_input = QLineEdit()

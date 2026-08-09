@@ -14,7 +14,6 @@ class VisualDisplay(QWidget):
         acceleration_arrows_label = QLabel("Show Acceleration arrows")
         self.acceleration_arrows_checkbox = QCheckBox()
 
-
         velocity_arrows_label = QLabel("Show Velocity arrows")
         self.velocity_arrows_checkbox = QCheckBox()
 
