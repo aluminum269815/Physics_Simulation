@@ -10,6 +10,7 @@ class VisualDisplay(QWidget):
         self.main_window = main_window
         self.setWindowTitle("Visual Display")
         self.setFixedSize(250, 100)
+        self.setStyleSheet("font-family: Arial;")
 
         acceleration_arrows_label = QLabel("Show Acceleration arrows")
         self.acceleration_arrows_checkbox = QCheckBox()

@@ -10,6 +10,12 @@ class BasicParameters(QWidget):
         self.main_window = main_window
         self.setWindowTitle("Basic Parameters")
         self.setFixedSize(350, 250)
+        self.setStyleSheet("""
+            QLabel{
+                font-family: Arial;
+            }
+        
+        """)
 
         air_resistance_label = QLabel("Air resistance")
 
@@ -50,7 +56,7 @@ class BasicParameters(QWidget):
         air_resistance_row = QHBoxLayout()
         air_resistance_row.addWidget(air_resistance_label)
         air_resistance_row.addWidget(self.air_resistance_checkbox)
-        air_resistance_row.addStretch()
+        air_resistance_row.addStretch(4)
 
         layout.addLayout(air_resistance_row)
 

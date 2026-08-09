@@ -15,14 +15,18 @@ class Program(QWidget):
 
         self.setWindowTitle("Projectile Motion sim")
         self.background = QPixmap(os.path.abspath("asset/background.png"))
-        self.resize(700, 500)
+        self.resize(700, 350)
+        self.setStyleSheet("""
+            QLabel{
+                font-family: Arial;
+            }
+        """)
 
         self.settings = Settings()
         self.settings_window = None
 
         self.settings_panel = QPushButton("⚙ Settings    ▼")
         self.settings_panel.clicked.connect(self.toggle_settings)
-
         self.settings_panel.setFixedSize(150, 40)
 
         self.settings_menu = QFrame()
@@ -41,11 +45,13 @@ class Program(QWidget):
                 padding: 8px;
                 text-align: left;
                 border-radius: 4px;
+                font-family: Arial;
             }
     
             QPushButton:hover {
                 background-color: #eeeeee;
                 font-family: Arial;
+                font-weight: bold;
             }
         """)
 
@@ -148,7 +154,7 @@ class Program(QWidget):
 
     def paintEvent(self, event):
         painter = QPainter(self)
-        scaled = self.background.scaled(self.size(),Qt.KeepAspectRatio)
+        scaled = self.background.scaled(self.size(), Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
         painter.drawPixmap(0, 0, scaled)
 
 app = QApplication(sys.argv)

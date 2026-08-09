@@ -10,17 +10,20 @@ class CannonSettings(QWidget):
         self.main_window = main_window
         self.setWindowTitle("Cannon Settings")
         self.setFixedSize(350, 250)
+        self.setStyleSheet("font-family: Arial;")
 
         initial_velocity_label = QLabel("Initial Velocity")
 
         self.initial_velocity_slider = QSlider(Qt.Horizontal)
         self.initial_velocity_slider.setMinimum(0)
         self.initial_velocity_slider.setMaximum(100000)
-        self.initial_velocity_slider.setValue(0)
+        self.initial_velocity_slider.setValue(30000)
 
         self.initial_velocity_input = QLineEdit()
-        self.initial_velocity_input.setText("0")
+        self.initial_velocity_input.setText("30")
         self.initial_velocity_input.setFixedWidth(60)
+
+        iv_unit= QLabel("m/s<sup>-1</sup>")
 
 
         cannonball_mass_label = QLabel("Cannonball Mass")
@@ -28,11 +31,13 @@ class CannonSettings(QWidget):
         self.cannonball_mass_slider = QSlider(Qt.Horizontal)
         self.cannonball_mass_slider.setMinimum(0)
         self.cannonball_mass_slider.setMaximum(100000)
-        self.cannonball_mass_slider.setValue(0)
+        self.cannonball_mass_slider.setValue(10000)
 
         self.cannonball_mass_input = QLineEdit()
-        self.cannonball_mass_input.setText("0")
+        self.cannonball_mass_input.setText("10")
         self.cannonball_mass_input.setFixedWidth(60)
+
+        cbm_unit = QLabel(" kg   ")
 
         cannon_height_label = QLabel("Cannon Height")
 
@@ -45,27 +50,33 @@ class CannonSettings(QWidget):
         self.cannon_height_input.setText("0")
         self.cannon_height_input.setFixedWidth(60)
 
+        ch_unit = QLabel(" m   ")
+
         cannonball_radius_label = QLabel("Cannon Radius")
 
         self.cannonball_radius_slider = QSlider(Qt.Horizontal)
         self.cannonball_radius_slider.setMinimum(0)
         self.cannonball_radius_slider.setMaximum(100000)
-        self.cannonball_radius_slider.setValue(0)
+        self.cannonball_radius_slider.setValue(20000)
 
         self.cannonball_radius_input = QLineEdit()
-        self.cannonball_radius_input.setText("0")
+        self.cannonball_radius_input.setText("20")
         self.cannonball_radius_input.setFixedWidth(60)
+
+        cbr_unit = QLabel("cm   ")
 
         firing_angle_label = QLabel("Firing Angle")
 
         self.firing_angle_slider = QSlider(Qt.Horizontal)
         self.firing_angle_slider.setMinimum(0)
         self.firing_angle_slider.setMaximum(80000)
-        self.firing_angle_slider.setValue(0)
+        self.firing_angle_slider.setValue(45000)
 
         self.firing_angle_input = QLineEdit()
-        self.firing_angle_input.setText("0")
+        self.firing_angle_input.setText("45")
         self.firing_angle_input.setFixedWidth(60)
+
+        fa_unit = QLabel("\u00B0    ")
 
         self.initial_velocity_slider.valueChanged.connect(self.update_initial_velocity)
         self.initial_velocity_input.editingFinished.connect(self.change_initial_velocity)
@@ -89,6 +100,7 @@ class CannonSettings(QWidget):
         initial_velocity_row = QHBoxLayout()
         initial_velocity_row.addWidget(self.initial_velocity_slider)
         initial_velocity_row.addWidget(self.initial_velocity_input)
+        initial_velocity_row.addWidget(iv_unit)
 
         layout.addLayout(initial_velocity_row)
 
@@ -97,6 +109,7 @@ class CannonSettings(QWidget):
         cannonball_mass_row = QHBoxLayout()
         cannonball_mass_row.addWidget(self.cannonball_mass_slider)
         cannonball_mass_row.addWidget(self.cannonball_mass_input)
+        cannonball_mass_row.addWidget(cbm_unit)
 
         layout.addLayout(cannonball_mass_row)
 
@@ -105,6 +118,7 @@ class CannonSettings(QWidget):
         cannon_height_row = QHBoxLayout()
         cannon_height_row.addWidget(self.cannon_height_slider)
         cannon_height_row.addWidget(self.cannon_height_input)
+        cannon_height_row.addWidget(ch_unit)
 
         layout.addLayout(cannon_height_row)
 
@@ -113,6 +127,7 @@ class CannonSettings(QWidget):
         cannonball_radius_row = QHBoxLayout()
         cannonball_radius_row.addWidget(self.cannonball_radius_slider)
         cannonball_radius_row.addWidget(self.cannonball_radius_input)
+        cannonball_radius_row.addWidget(cbr_unit)
 
         layout.addLayout(cannonball_radius_row)
 
@@ -121,6 +136,7 @@ class CannonSettings(QWidget):
         firing_angle_row = QHBoxLayout()
         firing_angle_row.addWidget(self.firing_angle_slider)
         firing_angle_row.addWidget(self.firing_angle_input)
+        firing_angle_row.addWidget(fa_unit)
 
         layout.addLayout(firing_angle_row)
 
