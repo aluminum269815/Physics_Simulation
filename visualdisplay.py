@@ -4,9 +4,8 @@ from PyQt5.QtCore import *
 
 
 class VisualDisplay(QWidget):
-
     def __init__(self, main_window):
-        super().__init__()
+        super().__init__(main_window, Qt.Window)
         self.main_window = main_window
         self.setWindowTitle("Visual Display")
         self.setFixedSize(250, 100)

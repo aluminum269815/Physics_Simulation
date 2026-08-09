@@ -9,10 +9,11 @@ from basicparameters import BasicParameters
 from visualdisplay import VisualDisplay
 from cannonsettings import CannonSettings
 from cannonballdetails import CannonballDetails
+import equations
+
 class Program(QWidget):
     def __init__(self):
         super().__init__()
-
         self.setWindowTitle("Projectile Motion sim")
         self.background = QPixmap(os.path.abspath("asset/background.png"))
         self.resize(700, 350)
@@ -22,8 +23,35 @@ class Program(QWidget):
             }
         """)
 
+        self.basic_parameters_window = None
+        self.visual_display_window = None
+        self.cannon_settings_window = None
+        self.cannonball_details_window = None
+
+        self.air_density = 1.225
+        self.gravity = 9.81
+        self.initial_velocity = 30.0
+        self.cannonball_mass = 10.0
+        self.cannon_height = 0.0
+        self.cannonball_radius = 20.0
+        self.firing_angle = 45.0
+        self.time = 0.0
+
+        self.v_horizontal = 0.0
+        self.v_vertical = 0.0
+        self.v_total = 0.0
+        self.a_horizontal = 0.0
+        self.a_vertical = 0.0
+        self.a_total = 0.0
+        self.kinetic_energy = 0.0
+        self.gpe = 0.0
+        self.position_horizontal = 0.0
+        self.position_vertical = 0.0
+
+        self.recalculate()
+
+
         self.settings = Settings()
-        self.settings_window = None
 
         self.settings_panel = QPushButton("⚙ Settings    ▼")
         self.settings_panel.clicked.connect(self.toggle_settings)
@@ -116,41 +144,87 @@ class Program(QWidget):
             self.settings_panel.setText("⚙ Settings    ▼")
 
     def unfold_basic_parameters(self):
-        self.settings_window = BasicParameters(self)
-        self.settings_window.show()
+        if self.basic_parameters_window is not None and self.basic_parameters_window.isVisible():
+            self.basic_parameters_window.raise_()
+            self.basic_parameters_window.activateWindow()
+            return
+        self.basic_parameters_window = BasicParameters(self)
+        self.basic_parameters_window.show()
 
     def unfold_visual_display(self):
-        self.settings_window = VisualDisplay(self)
-        self.settings_window.show()
+        if self.visual_display_window is not None and self.visual_display_window.isVisible():
+            self.visual_display_window.raise_()
+            self.visual_display_window.activateWindow()
+            return
+        self.visual_display_window = VisualDisplay(self)
+        self.visual_display_window.show()
 
     def unfold_cannon_settings(self):
-        self.settings_window = CannonSettings(self)
-        self.settings_window.show()
+        if self.cannon_settings_window is not None and self.cannon_settings_window.isVisible():
+            self.cannon_settings_window.raise_()
+            self.cannon_settings_window.activateWindow()
+            return
+        self.cannon_settings_window = CannonSettings(self)
+        self.cannon_settings_window.show()
 
     def unfold_cannonball_details(self):
-        self.settings_window = CannonballDetails(self)
-        self.settings_window.show()
+        if self.cannonball_details_window is not None and self.cannonball_details_window.isVisible():
+            self.cannonball_details_window.raise_()
+            self.cannonball_details_window.activateWindow()
+            return
+        self.cannonball_details_window = CannonballDetails(self)
+        self.cannonball_details_window.update_display()
+        self.cannonball_details_window.show()
 
     def change_air_density_size(self,value):
-        print("air density:", value, "kg/m<sup>-3<sup>")
+        self.air_density = value
+        self.recalculate()
+        self.update_cannonball_details_display()
 
     def change_gravity_size(self,value):
-        print("gravity:", value, "m/s<sup>-2<sup>")
+        self.gravity = value
+        self.recalculate()
+        self.update_cannonball_details_display()
 
     def change_initial_velocity_size(self, value):
-        print("Initial velocity:", value, "m/s<sup>-1<sup>")
+        self.initial_velocity = value
+        self.recalculate()
+        self.update_cannonball_details_display()
 
     def change_cannonball_mass_size(self, value):
-        print("Cannonball mass:", value, "kg")
+        self.cannonball_mass = value
+        self.recalculate()
+        self.update_cannonball_details_display()
 
     def change_cannon_height_size(self, value):
-        print("Cannon height:", value, "m")
+        self.cannon_height = value
+        self.recalculate()
+        self.update_cannonball_details_display()
 
     def change_cannonball_radius_size(self, value):
-        print("Cannonball radius:", value, "cm")
+        self.cannonball_radius = value
+        self.update_cannonball_details_display()
 
     def change_firing_angle_size(self, value):
-        print("Firing angle:", value, "\u00B0")
+        self.firing_angle = value
+        self.recalculate()
+        self.update_cannonball_details_display()
+
+    def recalculate(self):
+        self.v_horizontal, self.v_vertical = equations.velocity_components(self.initial_velocity, self.firing_angle, self.time, self.gravity)
+        self.v_total = equations.total_velocity(self.v_horizontal, self.v_vertical)
+
+        self.a_horizontal, self.a_vertical = equations.acceleration_components(self.gravity)
+        self.a_total = equations.total_acceleration(self.a_horizontal, self.a_vertical)
+
+        self.kinetic_energy = equations.ke(self.cannonball_mass, self.v_total)
+        self.gpe = equations.gpe(self.cannonball_mass, self.gravity, self.cannon_height)
+
+        self.position_horizontal, self.position_vertical = equations.position(self.initial_velocity, self.firing_angle, self.time, self.gravity, self.cannon_height)
+
+    def update_cannonball_details_display(self):
+        if self.cannonball_details_window is not None:
+            self.cannonball_details_window.update_display()
 
     def paintEvent(self, event):
         painter = QPainter(self)
