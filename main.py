@@ -52,29 +52,24 @@ class Program(QWidget):
 
         self.recalculate()
 
-
         self.pixels_per_meter = 20
         self.origin_x = 100
         self.origin_y = int(self.height() * 0.88)
 
         self.target = Target(self)
         self.target.ground_y = self.origin_y
-        self.target.move(500, self.target.ground_y - self.target.height())
+        self.target.moveTo(500, self.target.ground_y - self.target.height())
         self.target.moved.connect(self.update_target_position_label)
 
         self.target_position_label = QLabel(self)
         self.target_position_label.setStyleSheet("""
-            background-color: rgba(255, 255, 255, 180);
-            padding: 4px 8px;
+            background-color: rgba(255, 255, 255, 190);
+            padding: 2px 6px;
             border-radius: 4px;
             font-family: Arial;
+            font-size: 11px;
         """)
-        self.target_position_label.move(10, 10)
         self.update_target_position_label(self.target.x(), self.target.y())
-
-        self.target = Target(self)
-        self.target.ground_y = int(self.height() * 0.88)
-        self.target.move(500, self.target.ground_y - self.target.height())
 
         self.settings = Settings()
 
@@ -90,7 +85,7 @@ class Program(QWidget):
                 border: 1px solid #cccccc;
                 border-radius: 8px;
             }
-    
+
             QPushButton {
                 background-color: #c2c1c2;
                 color: black;
@@ -100,7 +95,7 @@ class Program(QWidget):
                 border-radius: 4px;
                 font-family: Arial;
             }
-    
+
             QPushButton:hover {
                 background-color: #eeeeee;
                 font-family: Arial;
@@ -114,7 +109,6 @@ class Program(QWidget):
         settings_layout.setSpacing(4)
 
         self.settings_menu.setLayout(settings_layout)
-
 
         self.basic_parameters_button = QPushButton("Basic Parameters")
         self.visual_display_button = QPushButton("Visual Displays")
@@ -201,12 +195,12 @@ class Program(QWidget):
         self.cannonball_details_window.update_display()
         self.cannonball_details_window.show()
 
-    def change_air_density_size(self,value):
+    def change_air_density_size(self, value):
         self.air_density = value
         self.recalculate()
         self.update_cannonball_details_display()
 
-    def change_gravity_size(self,value):
+    def change_gravity_size(self, value):
         self.gravity = value
         self.recalculate()
         self.update_cannonball_details_display()
@@ -236,7 +230,8 @@ class Program(QWidget):
         self.update_cannonball_details_display()
 
     def recalculate(self):
-        self.v_horizontal, self.v_vertical = equations.velocity_components(self.initial_velocity, self.firing_angle, self.time, self.gravity)
+        self.v_horizontal, self.v_vertical = equations.velocity_components(self.initial_velocity, self.firing_angle,
+                                                                           self.time, self.gravity)
         self.v_total = equations.total_velocity(self.v_horizontal, self.v_vertical)
 
         self.a_horizontal, self.a_vertical = equations.acceleration_components(self.gravity)
@@ -245,7 +240,9 @@ class Program(QWidget):
         self.kinetic_energy = equations.ke(self.cannonball_mass, self.v_total)
         self.gpe = equations.gpe(self.cannonball_mass, self.gravity, self.cannon_height)
 
-        self.position_horizontal, self.position_vertical = equations.position(self.initial_velocity, self.firing_angle, self.time, self.gravity, self.cannon_height)
+        self.position_horizontal, self.position_vertical = equations.position(self.initial_velocity, self.firing_angle,
+                                                                              self.time, self.gravity,
+                                                                              self.cannon_height)
 
     def update_cannonball_details_display(self):
         if self.cannonball_details_window is not None:
@@ -262,21 +259,32 @@ class Program(QWidget):
 
     def update_target_position_label(self, px, py):
         x_metres, y_metres = self.pixels_to_metres(px, py)
-        self.target_position_label.setText(f"Target: {x_metres:.2f} m, {y_metres:.2f} m")
+        self.target_position_label.setText(f"{x_metres:.2f} m, {y_metres:.2f} m")
         self.target_position_label.adjustSize()
+
+        label_x = px + (self.target.width() // 2) - (self.target_position_label.width() // 2)
+        label_y = py - self.target_position_label.height() - 4
+        self.target_position_label.move(label_x, label_y)
+
     def paintEvent(self, event):
         painter = QPainter(self)
         scaled = self.background.scaled(self.size(), Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
         painter.drawPixmap(0, 0, scaled)
 
     def resizeEvent(self, event):
-        self.target.ground_y = int(self.height() * 0.88)
+        self.origin_y = int(self.height() * 0.88)
+        self.target.ground_y = self.origin_y
         max_y = self.target.ground_y - self.target.height()
         if self.target.y() > max_y:
-            self.target.move(self.target.x(), max_y)
+            self.target.moveTo(self.target.x(), max_y)
+        else:
+            self.update_target_position_label(self.target.x(), self.target.y())
         super().resizeEvent(event)
 
-app = QApplication(sys.argv)
-window = Program()
-window.show()
-sys.exit(app.exec_())
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = Program()
+    window.show()
+    sys.exit(app.exec_())
+

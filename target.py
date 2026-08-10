@@ -55,9 +55,14 @@ class Target(QLabel):
                     new_pos.setY(max_y)
 
             self.move(new_pos)
+            self.moved.emit(new_pos.x(), new_pos.y())
 
     def mouseReleaseEvent(self, event):
         if event.button() == Qt.LeftButton:
             self._dragging = False
             self.setCursor(Qt.OpenHandCursor)
+
+    def moveTo(self, x, y):
+        self.move(x, y)
+        self.moved.emit(x, y)
 
