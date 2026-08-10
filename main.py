@@ -10,13 +10,15 @@ from visualdisplay import VisualDisplay
 from cannonsettings import CannonSettings
 from cannonballdetails import CannonballDetails
 import equations
+from target import Target
+
 
 class Program(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Projectile Motion sim")
         self.background = QPixmap(os.path.abspath("asset/background.png"))
-        self.resize(700, 350)
+        self.resize(1100, 650)
         self.setStyleSheet("""
             QLabel{
                 font-family: Arial;
@@ -50,6 +52,9 @@ class Program(QWidget):
 
         self.recalculate()
 
+        self.target = Target(self)
+        self.target.ground_y = int(self.height() * 0.88)
+        self.target.move(500, self.target.ground_y - self.target.height())
 
         self.settings = Settings()
 
@@ -226,10 +231,18 @@ class Program(QWidget):
         if self.cannonball_details_window is not None:
             self.cannonball_details_window.update_display()
 
+
     def paintEvent(self, event):
         painter = QPainter(self)
         scaled = self.background.scaled(self.size(), Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
         painter.drawPixmap(0, 0, scaled)
+
+    def resizeEvent(self, event):
+        self.target.ground_y = int(self.height() * 0.88)
+        max_y = self.target.ground_y - self.target.height()
+        if self.target.y() > max_y:
+            self.target.move(self.target.x(), max_y)
+        super().resizeEvent(event)
 
 app = QApplication(sys.argv)
 window = Program()
