@@ -1,11 +1,14 @@
 import os
 
-from PyQt5.QtWidgets import QLabel
-from PyQt5.QtGui import QPixmap
-from PyQt5.QtCore import Qt, QPoint
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 
 
 class Target(QLabel):
+
+    moved = pyqtSignal(int, int)
+
     def __init__(self, parent=None, image_path="asset/target.png", size=100, ground_y=None):
         super().__init__(parent)
 
@@ -57,3 +60,4 @@ class Target(QLabel):
         if event.button() == Qt.LeftButton:
             self._dragging = False
             self.setCursor(Qt.OpenHandCursor)
+

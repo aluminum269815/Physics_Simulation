@@ -52,6 +52,26 @@ class Program(QWidget):
 
         self.recalculate()
 
+
+        self.pixels_per_meter = 20
+        self.origin_x = 100
+        self.origin_y = int(self.height() * 0.88)
+
+        self.target = Target(self)
+        self.target.ground_y = self.origin_y
+        self.target.move(500, self.target.ground_y - self.target.height())
+        self.target.moved.connect(self.update_target_position_label)
+
+        self.target_position_label = QLabel(self)
+        self.target_position_label.setStyleSheet("""
+            background-color: rgba(255, 255, 255, 180);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: Arial;
+        """)
+        self.target_position_label.move(10, 10)
+        self.update_target_position_label(self.target.x(), self.target.y())
+
         self.target = Target(self)
         self.target.ground_y = int(self.height() * 0.88)
         self.target.move(500, self.target.ground_y - self.target.height())
@@ -95,6 +115,7 @@ class Program(QWidget):
 
         self.settings_menu.setLayout(settings_layout)
 
+
         self.basic_parameters_button = QPushButton("Basic Parameters")
         self.visual_display_button = QPushButton("Visual Displays")
         self.cannon_settings_button = QPushButton("Cannon Settings")
@@ -136,7 +157,6 @@ class Program(QWidget):
         layout.addStretch()
 
         self.setLayout(layout)
-
 
     def toggle_settings(self):
         is_visible = self.settings_menu.isVisible()
@@ -231,7 +251,19 @@ class Program(QWidget):
         if self.cannonball_details_window is not None:
             self.cannonball_details_window.update_display()
 
+    def pixels_to_metres(self, px, py):
+        centre_x = px + (self.target.width() / 2)
+        bottom_y = py + self.target.height()
 
+        x_metres = (centre_x - self.origin_x) / self.pixels_per_meter
+        y_metres = (self.origin_y - bottom_y) / self.pixels_per_meter
+
+        return x_metres, y_metres
+
+    def update_target_position_label(self, px, py):
+        x_metres, y_metres = self.pixels_to_metres(px, py)
+        self.target_position_label.setText(f"Target: {x_metres:.2f} m, {y_metres:.2f} m")
+        self.target_position_label.adjustSize()
     def paintEvent(self, event):
         painter = QPainter(self)
         scaled = self.background.scaled(self.size(), Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
