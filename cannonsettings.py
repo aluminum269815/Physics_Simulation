@@ -150,9 +150,13 @@ class CannonSettings(QWidget):
         try:
             value = float(self.initial_velocity_input.text())
             slider_value = int(value * 1000)
+            slider_value = max(self.initial_velocity_slider.minimum(), min(slider_value, self.initial_velocity_slider.maximum()))
             self.initial_velocity_slider.setValue(slider_value)
+            clamped_value = slider_value / 1000
+            self.initial_velocity_input.setText(f"{clamped_value:.3f}")
+            self.main_window.change_initial_velocity_size(clamped_value)
         except ValueError:
-            pass
+            self.initial_velocity_input.setText(f"{self.main_window.initial_velocity:.3f}")
 
     def update_cannonball_mass(self, value):
         cannonball_mass = value / 1000
@@ -163,9 +167,13 @@ class CannonSettings(QWidget):
         try:
             value = float(self.cannonball_mass_input.text())
             slider_value = int(value * 1000)
+            slider_value = max(self.cannonball_mass_slider.minimum(),min(slider_value, self.cannonball_mass_slider.maximum()))
             self.cannonball_mass_slider.setValue(slider_value)
+            clamped_value = slider_value / 1000
+            self.cannonball_mass_input.setText(f"{clamped_value:.3f}")
+            self.main_window.change_cannonball_mass_size(clamped_value)
         except ValueError:
-            pass
+            self.cannonball_mass_input.setText(f"{self.main_window.cannonball_mass:.3f}")
 
     def update_cannon_height(self, value):
         cannon_height = value / 1000
@@ -176,9 +184,14 @@ class CannonSettings(QWidget):
         try:
             value = float(self.cannon_height_input.text())
             slider_value = int(value * 1000)
+            slider_value = max(self.cannon_height_slider.minimum(), min(slider_value, self.cannon_height_slider.maximum()))
             self.cannon_height_slider.setValue(slider_value)
+            clamped_value = slider_value / 1000
+            self.cannon_height_input.setText(f"{clamped_value:.3f}")
+            self.main_window.change_cannon_height_size(clamped_value)
         except ValueError:
-            pass
+            self.cannon_height_input.setText(f"{self.main_window.cannon_height:.3f}")
+
 
     def update_cannonball_radius(self, value):
         cannonball_radius = value / 1000
@@ -189,9 +202,14 @@ class CannonSettings(QWidget):
         try:
             value = float(self.cannonball_radius_input.text())
             slider_value = int(value * 1000)
+            slider_value = max(self.cannonball_radius_slider.minimum(), min(slider_value, self.cannonball_radius_slider.maximum()))
             self.cannonball_radius_slider.setValue(slider_value)
+            clamped_value = slider_value / 1000
+            self.cannonball_radius_input.setText(f"{clamped_value:.3f}")
+            self.main_window.change_cannonball_radius_size(clamped_value)
         except ValueError:
-            pass
+            self.cannonball_radius_input.setText(f"{self.main_window.cannonball_radius:.3f}")
+
 
     def update_firing_angle(self, value):
         firing_angle = value / 1000
@@ -202,6 +220,10 @@ class CannonSettings(QWidget):
         try:
             value = float(self.firing_angle_input.text())
             slider_value = int(value * 1000)
+            slider_value = max(self.firing_angle_slider.minimum(), min(slider_value, self.firing_angle_slider.maximum()))
             self.firing_angle_slider.setValue(slider_value)
+            clamped_value = slider_value / 1000
+            self.firing_angle_input.setText(f"{clamped_value:.3f}")
+            self.main_window.change_firing_angle_size(clamped_value)
         except ValueError:
-            pass
+            self.firing_angle_input.setText(f"{self.main_window.firing_angle:.3f}")

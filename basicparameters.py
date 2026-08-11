@@ -90,9 +90,13 @@ class BasicParameters(QWidget):
         try:
             value = float(self.air_density_input.text())
             slider_value = int(value * 1000)
+            slider_value = max(self.air_density_slider.minimum(), min(slider_value, self.air_density_slider.maximum()))
             self.air_density_slider.setValue(slider_value)
+            clamped_value = slider_value / 1000
+            self.air_density_input.setText(f"{clamped_value:.3f}")
+            self.main_window.change_air_density_size(clamped_value)
         except ValueError:
-            pass
+            self.air_density_input.setText(f"{self.main_window.air_density:.3f}")
 
     def update_gravity(self, value):
         gravity = value / 1000
@@ -104,6 +108,10 @@ class BasicParameters(QWidget):
         try:
             value = float(self.gravity_input.text())
             slider_value = int(value * 1000)
+            slider_value = max(self.gravity_slider.minimum(), min(slider_value, self.gravity_slider.maximum()))
             self.gravity_slider.setValue(slider_value)
+            clamped_value = slider_value / 1000
+            self.gravity_input.setText(f"{clamped_value:.3f}")
+            self.main_window.change_gravity_size(clamped_value)
         except ValueError:
-            pass
+            self.gravity_input.setText(f"{self.main_window.gravity:.3f}")

@@ -11,6 +11,7 @@ from cannonsettings import CannonSettings
 from cannonballdetails import CannonballDetails
 import equations
 from target import Target
+from cannon import Cannon
 
 
 class Program(QWidget):
@@ -70,6 +71,12 @@ class Program(QWidget):
             font-size: 11px;
         """)
         self.update_target_position_label(self.target.x(), self.target.y())
+
+        self.WALL_WIDTH_RATIO = 78 / 1774
+
+        self.cannon = Cannon(self, ground_y=self.origin_y, top_y=0)
+        self.position_cannon_x()
+        self.cannon.moveTo(self.origin_y - self.cannon.height())
 
         self.settings = Settings()
 
@@ -266,6 +273,12 @@ class Program(QWidget):
         label_y = py - self.target_position_label.height() - 4
         self.target_position_label.move(label_x, label_y)
 
+    def position_cannon_x(self):
+        wall_width = int(self.width() * self.WALL_WIDTH_RATIO)
+        overlap = 8
+        cannon_x = max(0, wall_width - overlap)
+        self.cannon.move(cannon_x, self.cannon.y())
+
     def paintEvent(self, event):
         painter = QPainter(self)
         scaled = self.background.scaled(self.size(), Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
@@ -279,8 +292,12 @@ class Program(QWidget):
             self.target.moveTo(self.target.x(), max_y)
         else:
             self.update_target_position_label(self.target.x(), self.target.y())
-        super().resizeEvent(event)
 
+        self.position_cannon_x()
+        self.cannon.ground_y = self.origin_y
+        self.cannon.moveTo(self.cannon.y())
+
+        super().resizeEvent(event)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
