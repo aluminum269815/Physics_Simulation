@@ -53,7 +53,7 @@ class Program(QWidget):
 
         self.recalculate()
 
-        self.pixels_per_meter = 20
+        self.pixels_per_meter = 2
         self.origin_x = 100
         self.origin_y = int(self.height() * 0.88)
 
@@ -74,13 +74,13 @@ class Program(QWidget):
 
         self.WALL_WIDTH_RATIO = 78 / 1774
 
-        self.cannon = Cannon(self, ground_y=self.origin_y, top_y=0)
+        self.cannon = Cannon(self, ground_y=self.origin_y, top_y=0, lift_height = 70, head_height = 45)
         self.position_cannon_x()
         self.cannon.moveTo(self.origin_y - self.cannon.height())
 
         self.settings = Settings()
 
-        self.settings_panel = QPushButton("⚙ Settings    ▼")
+        self.settings_panel = QPushButton("   Settings    ▼")
         self.settings_panel.clicked.connect(self.toggle_settings)
         self.settings_panel.setFixedSize(150, 40)
 
@@ -165,9 +165,9 @@ class Program(QWidget):
         self.settings_menu.setVisible(not is_visible)
 
         if is_visible:
-            self.settings_panel.setText("⚙ Settings    ▶")
+            self.settings_panel.setText("   Settings    ▶")
         else:
-            self.settings_panel.setText("⚙ Settings    ▼")
+            self.settings_panel.setText("   Settings    ▼")
 
     def unfold_basic_parameters(self):
         if self.basic_parameters_window is not None and self.basic_parameters_window.isVisible():
@@ -275,7 +275,7 @@ class Program(QWidget):
 
     def position_cannon_x(self):
         wall_width = int(self.width() * self.WALL_WIDTH_RATIO)
-        overlap = 8
+        overlap = 5
         cannon_x = max(0, wall_width - overlap)
         self.cannon.move(cannon_x, self.cannon.y())
 
