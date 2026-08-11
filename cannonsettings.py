@@ -42,8 +42,10 @@ class CannonSettings(QWidget):
 
         self.cannon_height_slider = QSlider(Qt.Horizontal)
         self.cannon_height_slider.setMinimum(0)
-        self.cannon_height_slider.setMaximum(100000)
-        self.cannon_height_slider.setValue(0)
+        cannon = main_window.cannon
+        max_height_metres = (cannon.ground_y - cannon.height() - cannon.top_y) / main_window.pixels_per_meter
+        self.cannon_height_slider.setMaximum(int(max_height_metres * 1000))
+        self.cannon_height_slider.setValue(int(main_window.cannon_height * 1000))
 
         self.cannon_height_input = QLineEdit()
         self.cannon_height_input.setText("0")
@@ -51,7 +53,7 @@ class CannonSettings(QWidget):
 
         ch_unit = QLabel(" m   ")
 
-        cannonball_radius_label = QLabel("Cannon Radius")
+        cannonball_radius_label = QLabel("Cannonball Radius")
 
         self.cannonball_radius_slider = QSlider(Qt.Horizontal)
         self.cannonball_radius_slider.setMinimum(0)
@@ -191,6 +193,14 @@ class CannonSettings(QWidget):
             self.main_window.change_cannon_height_size(clamped_value)
         except ValueError:
             self.cannon_height_input.setText(f"{self.main_window.cannon_height:.3f}")
+
+    def sync_cannon_height_display(self, height_metres):
+        slider_value = int(height_metres * 1000)
+        slider_value = max(self.cannon_height_slider.minimum(), min(slider_value, self.cannon_height_slider.maximum()))
+        self.cannon_height_slider.blockSignals(True)
+        self.cannon_height_slider.setValue(slider_value)
+        self.cannon_height_slider.blockSignals(False)
+        self.cannon_height_input.setText(f"{height_metres:.3f}")
 
 
     def update_cannonball_radius(self, value):

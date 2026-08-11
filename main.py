@@ -76,7 +76,9 @@ class Program(QWidget):
 
         self.cannon = Cannon(self, ground_y=self.origin_y + 20, top_y=0, lift_height = 85, head_height = 40)
         self.position_cannon_x()
+        self.cannon.moved.connect(self.on_cannon_moved)
         self.cannon.moveTo(self.origin_y - self.cannon.height())
+        self.cannon.set_firing_angle(self.firing_angle)
 
         self.settings = Settings()
 
@@ -226,6 +228,7 @@ class Program(QWidget):
         self.cannon_height = value
         self.recalculate()
         self.update_cannonball_details_display()
+        self.update_cannon_position()
 
     def change_cannonball_radius_size(self, value):
         self.cannonball_radius = value
@@ -235,6 +238,7 @@ class Program(QWidget):
         self.firing_angle = value
         self.recalculate()
         self.update_cannonball_details_display()
+        self.cannon.set_firing_angle(value)
 
     def recalculate(self):
         self.v_horizontal, self.v_vertical = equations.velocity_components(self.initial_velocity, self.firing_angle,
@@ -279,6 +283,22 @@ class Program(QWidget):
         cannon_x = max(0, wall_width - overlap)
         self.cannon.move(cannon_x, self.cannon.y())
 
+    def update_cannon_position(self):
+        height_pixels = int(self.cannon_height * self.pixels_per_meter)
+        new_y = self.cannon.ground_y - self.cannon.height() - height_pixels
+        self.cannon.moveTo(new_y)
+
+    def on_cannon_moved(self, y):
+        height_pixels = self.cannon.ground_y - self.cannon.height() - y
+        height_metres = height_pixels / self.pixels_per_meter
+
+        self.cannon_height = height_metres
+        self.recalculate()
+        self.update_cannonball_details_display()
+
+        if self.cannon_settings_window is not None and self.cannon_settings_window.isVisible():
+            self.cannon_settings_window.sync_cannon_height_display(height_metres)
+
     def paintEvent(self, event):
         painter = QPainter(self)
         scaled = self.background.scaled(self.size(), Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
@@ -295,7 +315,7 @@ class Program(QWidget):
 
         self.position_cannon_x()
         self.cannon.ground_y = self.origin_y + 20
-        self.cannon.moveTo(self.cannon.y())
+        self.update_cannon_position()
 
         super().resizeEvent(event)
 
@@ -304,4 +324,3 @@ if __name__ == "__main__":
     window = Program()
     window.show()
     sys.exit(app.exec_())
-
