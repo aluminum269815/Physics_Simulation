@@ -72,9 +72,9 @@ class Program(QWidget):
         """)
         self.update_target_position_label(self.target.x(), self.target.y())
 
-        self.WALL_WIDTH_RATIO = 78 / 1774
+        self.wall_width_ratio = 78 / 1774
 
-        self.cannon = Cannon(self, ground_y=self.origin_y, top_y=0, lift_height = 70, head_height = 45)
+        self.cannon = Cannon(self, ground_y=self.origin_y + 20, top_y=0, lift_height = 85, head_height = 40)
         self.position_cannon_x()
         self.cannon.moveTo(self.origin_y - self.cannon.height())
 
@@ -274,7 +274,7 @@ class Program(QWidget):
         self.target_position_label.move(label_x, label_y)
 
     def position_cannon_x(self):
-        wall_width = int(self.width() * self.WALL_WIDTH_RATIO)
+        wall_width = int(self.width() * self.wall_width_ratio)
         overlap = 5
         cannon_x = max(0, wall_width - overlap)
         self.cannon.move(cannon_x, self.cannon.y())
@@ -294,7 +294,7 @@ class Program(QWidget):
             self.update_target_position_label(self.target.x(), self.target.y())
 
         self.position_cannon_x()
-        self.cannon.ground_y = self.origin_y
+        self.cannon.ground_y = self.origin_y + 20
         self.cannon.moveTo(self.cannon.y())
 
         super().resizeEvent(event)
