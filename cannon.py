@@ -40,18 +40,36 @@ class Cannon(QWidget):
         raw_head = load_autocropped(head_path)
         self.head_pixmap = raw_head.scaledToHeight(head_height, Qt.SmoothTransformation) if not raw_head.isNull() else raw_head
 
-        self.head_offset_x = int(self.lift_pixmap.width() * 0.35)
-        self.head_offset_y = -int(self.head_pixmap.height() * 0.55)
+        self.head_pivot_x = int(self.head_pixmap.width() * 0.26)
+        self.head_pivot_y = int(self.head_pixmap.height() * 0.66)
 
-        self.head_pivot_x = int(self.head_pixmap.width() * 0.05)
-        self.head_pivot_y = int(self.head_pixmap.height() * 0.75)
+        lift_dot_x = int(self.lift_pixmap.width() * 0.674)
+        lift_dot_y = int(self.lift_pixmap.height() * 0.058)
+
+        self.head_offset_x = lift_dot_x - self.head_pivot_x
+        self.head_offset_y = lift_dot_y - self.head_pivot_y
+
+        self.head_offset_x += 5
 
         min_x = min(0, self.head_offset_x)
         min_y = min(0, self.head_offset_y)
         max_x = max(self.lift_pixmap.width(), self.head_offset_x + self.head_pixmap.width())
         max_y = max(self.lift_pixmap.height(), self.head_offset_y + self.head_pixmap.height())
 
+        pivot_x = self.head_offset_x + self.head_pivot_x
+        pivot_y = self.head_offset_y + self.head_pivot_y
+        corners = [
+            (self.head_offset_x, self.head_offset_y),
+            (self.head_offset_x + self.head_pixmap.width(), self.head_offset_y),
+            (self.head_offset_x, self.head_offset_y + self.head_pixmap.height()),
+            (self.head_offset_x + self.head_pixmap.width(), self.head_offset_y + self.head_pixmap.height()),
+        ]
+        sweep_radius = max(math.hypot(cx - pivot_x, cy - pivot_y) for cx, cy in corners)
 
+        min_x = math.floor(min(min_x, pivot_x - sweep_radius))
+        min_y = math.floor(min(min_y, pivot_y - sweep_radius))
+        max_x = math.ceil(max(max_x, pivot_x + sweep_radius))
+        max_y = math.ceil(max(max_y, pivot_y + sweep_radius))
 
         self._lift_draw_pos = QPoint(-min_x, -min_y)
         self._head_draw_pos = QPoint(self.head_offset_x - min_x, self.head_offset_y - min_y)
@@ -59,6 +77,8 @@ class Cannon(QWidget):
             self._head_draw_pos.x() + self.head_pivot_x,
             self._head_draw_pos.y() + self.head_pivot_y
         )
+
+        self.lift_bottom_offset = self._lift_draw_pos.y() + self.lift_pixmap.height()
 
         width = max(1, max_x - min_x)
         height = max(1, max_y - min_y)
@@ -109,9 +129,9 @@ class Cannon(QWidget):
             if self.top_y is not None:
                 new_y = max(new_y, self.top_y)
             if self.ground_y is not None:
-                new_y = min(new_y, self.ground_y - self.height())
+                new_y = min(new_y, self.ground_y - self.lift_bottom_offset)
 
-            self.move(self.x(), new_y)  # x never changes - vertical movement only
+            self.move(self.x(), new_y)
             self.moved.emit(new_y)
 
     def mouseReleaseEvent(self, event):
@@ -123,6 +143,6 @@ class Cannon(QWidget):
         if self.top_y is not None:
             y = max(y, self.top_y)
         if self.ground_y is not None:
-            y = min(y, self.ground_y - self.height())
+            y = min(y, self.ground_y - self.lift_bottom_offset)
         self.move(self.x(), y)
         self.moved.emit(y)

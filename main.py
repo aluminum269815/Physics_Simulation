@@ -74,10 +74,10 @@ class Program(QWidget):
 
         self.wall_width_ratio = 78 / 1774
 
-        self.cannon = Cannon(self, ground_y=self.origin_y + 0, top_y=0, lift_height = 85, head_height = 40)
+        self.cannon = Cannon(self, ground_y=self.origin_y + 0, top_y=0, lift_height = 60, head_height = 28)
         self.position_cannon_x()
         self.cannon.moved.connect(self.on_cannon_moved)
-        self.cannon.moveTo(self.origin_y - self.cannon.height())
+        self.cannon.moveTo(self.origin_y - self.cannon.lift_bottom_offset)
         self.cannon.set_firing_angle(self.firing_angle)
 
         self.settings = Settings()
@@ -285,11 +285,11 @@ class Program(QWidget):
 
     def update_cannon_position(self):
         height_pixels = int(self.cannon_height * self.pixels_per_meter)
-        new_y = self.cannon.ground_y - self.cannon.height() - height_pixels
+        new_y = self.cannon.ground_y - self.cannon.lift_bottom_offset - height_pixels
         self.cannon.moveTo(new_y)
 
     def on_cannon_moved(self, y):
-        height_pixels = self.cannon.ground_y - self.cannon.height() - y
+        height_pixels = self.cannon.ground_y - self.cannon.lift_bottom_offset - y
         height_metres = height_pixels / self.pixels_per_meter
 
         self.cannon_height = height_metres

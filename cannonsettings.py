@@ -71,10 +71,10 @@ class CannonSettings(QWidget):
         self.firing_angle_slider = QSlider(Qt.Horizontal)
         self.firing_angle_slider.setMinimum(0)
         self.firing_angle_slider.setMaximum(80000)
-        self.firing_angle_slider.setValue(45000)
+        self.firing_angle_slider.setValue(0)
 
         self.firing_angle_input = QLineEdit()
-        self.firing_angle_input.setText("45")
+        self.firing_angle_input.setText("0")
         self.firing_angle_input.setFixedWidth(60)
 
         fa_unit = QLabel("\u00B0    ")
