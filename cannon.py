@@ -51,10 +51,7 @@ class Cannon(QWidget):
         max_x = max(self.lift_pixmap.width(), self.head_offset_x + self.head_pixmap.width())
         max_y = max(self.lift_pixmap.height(), self.head_offset_y + self.head_pixmap.height())
 
-        rotation_padding = int(math.hypot(self.head_pixmap.width(), self.head_pixmap.height()))
-        min_x -= rotation_padding
-        min_y -= rotation_padding
-        max_x += rotation_padding
+
 
         self._lift_draw_pos = QPoint(-min_x, -min_y)
         self._head_draw_pos = QPoint(self.head_offset_x - min_x, self.head_offset_y - min_y)
