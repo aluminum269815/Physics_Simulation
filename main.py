@@ -1,4 +1,5 @@
 import os, sys
+import math
 
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
@@ -12,6 +13,8 @@ from cannonballdetails import CannonballDetails
 import equations
 from target import Target
 from cannon import Cannon
+from buttons import FireButton
+from cannonballflying import CannonballFlight, CannonballPreview
 
 
 class Program(QWidget):
@@ -33,6 +36,7 @@ class Program(QWidget):
 
         self.air_density = 1.225
         self.gravity = 9.81
+        self.air_resistance_enabled = False
         self.initial_velocity = 30.0
         self.cannonball_mass = 10.0
         self.cannon_height = 0.0
@@ -76,9 +80,20 @@ class Program(QWidget):
 
         self.cannon = Cannon(self, ground_y=self.origin_y + 0, top_y=0, lift_height = 60, head_height = 28)
         self.position_cannon_x()
+
+        self.flying_cannonball = None
+        self.fire_button = FireButton(self)
+        self.fire_button.clicked.connect(self.fire_cannon)
+        self.position_fire_button()
+
+        self.cannonball_preview = CannonballPreview(self)
+        self.cannonball_preview.show()
+
         self.cannon.moved.connect(self.on_cannon_moved)
         self.cannon.moveTo(self.origin_y - self.cannon.lift_bottom_offset)
         self.cannon.set_firing_angle(self.firing_angle)
+
+        self.update_cannonball_preview()
 
         self.settings = Settings()
 
@@ -230,15 +245,20 @@ class Program(QWidget):
         self.update_cannonball_details_display()
         self.update_cannon_position()
 
+    def change_air_resistance_enabled(self, enabled):
+        self.air_resistance_enabled = enabled
+
     def change_cannonball_radius_size(self, value):
         self.cannonball_radius = value
         self.update_cannonball_details_display()
+        self.update_cannonball_preview()
 
     def change_firing_angle_size(self, value):
         self.firing_angle = value
         self.recalculate()
         self.update_cannonball_details_display()
         self.cannon.set_firing_angle(value)
+        self.update_cannonball_preview()
 
     def recalculate(self):
         self.v_horizontal, self.v_vertical = equations.velocity_components(self.initial_velocity, self.firing_angle,
@@ -283,10 +303,67 @@ class Program(QWidget):
         cannon_x = max(0, wall_width - overlap)
         self.cannon.move(cannon_x, self.cannon.y())
 
+    def position_fire_button(self):
+        x = self.cannon.x()
+        y = self.origin_y + 10
+        self.fire_button.move(x, y)
+
+    def update_cannonball_preview(self):
+        self.cannonball_preview.set_radius(self.cannonball_radius / 100)
+        self.cannonball_preview.reposition_at(self.cannon.muzzle_point())
+
+    def fire_cannon(self):
+        if self.flying_cannonball is not None:
+            self.flying_cannonball.stop()
+            self.flying_cannonball.deleteLater()
+            self.flying_cannonball = None
+
+        self.cannonball_preview.hide()
+
+        muzzle_px = self.cannon.muzzle_point()
+        start_x_m = (muzzle_px.x() - self.origin_x) / self.pixels_per_meter
+        start_y_m = (self.origin_y - muzzle_px.y()) / self.pixels_per_meter
+
+        angle_rad = math.radians(self.firing_angle)
+        velocity_x = self.initial_velocity * math.cos(angle_rad)
+        velocity_y = self.initial_velocity * math.sin(angle_rad)
+
+        radius_m = self.cannonball_radius / 100  # cm -> m
+
+        self.flying_cannonball = CannonballFlight(
+            self, start_x_m, start_y_m, velocity_x, velocity_y,
+            self.cannonball_mass, radius_m
+        )
+        self.flying_cannonball.landed.connect(self.on_cannonball_landed)
+        self.flying_cannonball.show()
+        self.flying_cannonball.raise_()
+        self.flying_cannonball.start()
+
+        self.fire_button.setEnabled(False)
+
+    def on_cannonball_physics_update(self, x_m, y_m, vx, vy, ax, ay):
+        self.position_horizontal = x_m
+        self.position_vertical = y_m
+        self.v_horizontal = vx
+        self.v_vertical = vy
+        self.v_total = math.hypot(vx, vy)
+        self.a_horizontal = ax
+        self.a_vertical = ay
+        self.a_total = math.hypot(ax, ay)
+        self.kinetic_energy = 0.5 * self.cannonball_mass * (self.v_total ** 2)
+        self.gpe = self.cannonball_mass * self.gravity * max(y_m, 0)
+        self.update_cannonball_details_display()
+
+    def on_cannonball_landed(self):
+        self.fire_button.setEnabled(True)
+        self.update_cannonball_preview()
+        self.cannonball_preview.show()
+
     def update_cannon_position(self):
         height_pixels = int(self.cannon_height * self.pixels_per_meter)
         new_y = self.cannon.ground_y - self.cannon.lift_bottom_offset - height_pixels
         self.cannon.moveTo(new_y)
+        self.update_cannonball_preview()
 
     def on_cannon_moved(self, y):
         height_pixels = self.cannon.ground_y - self.cannon.lift_bottom_offset - y
@@ -295,6 +372,7 @@ class Program(QWidget):
         self.cannon_height = height_metres
         self.recalculate()
         self.update_cannonball_details_display()
+        self.update_cannonball_preview()
 
         if self.cannon_settings_window is not None and self.cannon_settings_window.isVisible():
             self.cannon_settings_window.sync_cannon_height_display(height_metres)
@@ -316,6 +394,7 @@ class Program(QWidget):
         self.position_cannon_x()
         self.cannon.ground_y = self.origin_y + 0
         self.update_cannon_position()
+        self.position_fire_button()
 
         super().resizeEvent(event)
 
