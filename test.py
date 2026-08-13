@@ -11,4 +11,4 @@ def test(cannonball, time):
         if key not in ('data_lists', 'time_index', 'gravity', 'air_resistance_enabled', 'air_density'):
             print(f"{key}: {value}")
 
-test(test_cannonball, 3)
+test(test_cannonball, 5)

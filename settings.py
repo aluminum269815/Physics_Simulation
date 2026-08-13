@@ -4,7 +4,7 @@ from constants import *
 class Settings:
     def __init__(self):
         self.gravity = DEFAULT_GRAVITY
-        self.air_resistance_enabled = False
+        self.air_resistance_enabled = True
         self.air_density = DEFAULT_AIR_DENSITY
         self.drag_coefficient = DEFAULT_DRAG_COEFFICIENT
 

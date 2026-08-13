@@ -76,7 +76,7 @@ class CannonBall:
 
     def update_data(self):
         if self.air_resistance_enabled:
-            self.time_index = min(int(self.time_after_firing // 0.001), len(self.data_lists['height']))
+            self.time_index = min(int(self.time_after_firing // 0.001), len(self.data_lists['x']) - 1)
         self.update_position()
         self.update_velocity()
         self.update_acceleration()

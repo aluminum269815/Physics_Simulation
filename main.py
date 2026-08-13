@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 
 from settings import Settings
+from constants import *
 
 
 class Program:
@@ -19,14 +20,15 @@ class Program:
 class Window(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Projectile Motion sim")
-        self.background = QPixmap(os.path.abspath("asset/background.png"))
-        self.resize(800, 500)
+        self.setWindowTitle("Projectile Motion Simulation")
+        self.background = QPixmap(os.path.abspath("assets/background.png"))
+        self.resize(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT)
 
-    def paintEvent(self, event):
+    def paintEvent(self, event, **kwargs):
         painter = QPainter(self)
-        scaled = self.background.scaled(self.size(), aspectRatioMode=2)
-        painter.drawPixmap(0, 0, scaled)
+        scaled_background = self.background.scaled(self.size(), aspectRatioMode=2)
+        painter.drawPixmap(0, 0, scaled_background)
 
-program = Program()
-program.run()
+if __name__ == '__main__':
+    program = Program()
+    program.run()
