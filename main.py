@@ -14,7 +14,11 @@ import equations
 from target import Target
 from cannon import Cannon
 from buttons import FireButton
-from cannonballflying import CannonballFlight, CannonballPreview
+from cannonballflying import CannonballFlight, CannonballPreview, VectorArrow
+from timeline import PauseResumeButton
+
+VELOCITY_ARROW_SCALE = 3
+ACCELERATION_ARROW_SCALE = 3
 
 
 class Program(QWidget):
@@ -55,6 +59,10 @@ class Program(QWidget):
         self.position_horizontal = 0.0
         self.position_vertical = 0.0
 
+        self.show_velocity_arrows = False
+        self.show_acceleration_arrows = False
+        self.flight_history = []
+
         self.recalculate()
 
         self.pixels_per_meter = 2
@@ -81,6 +89,11 @@ class Program(QWidget):
         self.cannon = Cannon(self, ground_y=self.origin_y + 0, top_y=0, lift_height = 60, head_height = 28)
         self.position_cannon_x()
 
+        self.velocity_arrow = VectorArrow(self, QColor(220, 30, 30))
+        self.acceleration_arrow = VectorArrow(self, QColor(30, 90, 220))
+        self.velocity_arrow.setGeometry(0, 0, self.width(), self.height())
+        self.acceleration_arrow.setGeometry(0, 0, self.width(), self.height())
+
         self.flying_cannonball = None
         self.fire_button = FireButton(self)
         self.fire_button.clicked.connect(self.fire_cannon)
@@ -88,6 +101,19 @@ class Program(QWidget):
 
         self.cannonball_preview = CannonballPreview(self)
         self.cannonball_preview.show()
+
+        self.pause_resume_button = PauseResumeButton(self)
+        self.pause_resume_button.clicked.connect(self.toggle_pause_resume)
+        self.pause_resume_button.setEnabled(False)
+
+        self.timeline_slider = QSlider(Qt.Horizontal, self)
+        self.timeline_slider.setMinimum(0)
+        self.timeline_slider.setMaximum(0)
+        self.timeline_slider.setEnabled(False)
+        self.timeline_slider.sliderPressed.connect(self.on_timeline_pressed)
+        self.timeline_slider.valueChanged.connect(self.on_timeline_scrubbed)
+
+        self.position_timeline()
 
         self.cannon.moved.connect(self.on_cannon_moved)
         self.cannon.moveTo(self.origin_y - self.cannon.lift_bottom_offset)
@@ -248,6 +274,24 @@ class Program(QWidget):
     def change_air_resistance_enabled(self, enabled):
         self.air_resistance_enabled = enabled
 
+    def change_show_velocity_arrows(self, enabled):
+        self.show_velocity_arrows = enabled
+        if not enabled:
+            self.velocity_arrow.hide_arrow()
+        elif self.flying_cannonball is not None:
+            self.update_arrows(self.position_horizontal, self.position_vertical,
+                                self.v_horizontal, self.v_vertical,
+                                self.a_horizontal, self.a_vertical)
+
+    def change_show_acceleration_arrows(self, enabled):
+        self.show_acceleration_arrows = enabled
+        if not enabled:
+            self.acceleration_arrow.hide_arrow()
+        elif self.flying_cannonball is not None:
+            self.update_arrows(self.position_horizontal, self.position_vertical,
+                                self.v_horizontal, self.v_vertical,
+                                self.a_horizontal, self.a_vertical)
+
     def change_cannonball_radius_size(self, value):
         self.cannonball_radius = value
         self.update_cannonball_details_display()
@@ -308,6 +352,19 @@ class Program(QWidget):
         y = self.origin_y + 10
         self.fire_button.move(x, y)
 
+    def position_timeline(self):
+        margin = 15
+        button_size = self.pause_resume_button.height()
+        y = self.height() - button_size - margin
+
+        self.pause_resume_button.move(margin, y)
+
+        slider_x = margin * 2 + self.pause_resume_button.width()
+        slider_width = max(50, self.width() - slider_x - margin)
+        slider_height = 20
+        slider_y = y + (button_size - slider_height) // 2
+        self.timeline_slider.setGeometry(slider_x, slider_y, slider_width, slider_height)
+
     def update_cannonball_preview(self):
         self.cannonball_preview.set_radius(self.cannonball_radius / 100)
         self.cannonball_preview.reposition_at(self.cannon.muzzle_point())
@@ -328,7 +385,7 @@ class Program(QWidget):
         velocity_x = self.initial_velocity * math.cos(angle_rad)
         velocity_y = self.initial_velocity * math.sin(angle_rad)
 
-        radius_m = self.cannonball_radius / 100  # cm -> m
+        radius_m = self.cannonball_radius / 100
 
         self.flying_cannonball = CannonballFlight(
             self, start_x_m, start_y_m, velocity_x, velocity_y,
@@ -337,11 +394,21 @@ class Program(QWidget):
         self.flying_cannonball.landed.connect(self.on_cannonball_landed)
         self.flying_cannonball.show()
         self.flying_cannonball.raise_()
-        self.flying_cannonball.start()
 
+        self.flight_history = []
+        self.timeline_slider.blockSignals(True)
+        self.timeline_slider.setMaximum(0)
+        self.timeline_slider.setValue(0)
+        self.timeline_slider.blockSignals(False)
+        self.timeline_slider.setEnabled(True)
+
+        self.pause_resume_button.setEnabled(True)
+        self.pause_resume_button.set_playing_state(True)
+
+        self.flying_cannonball.start()
         self.fire_button.setEnabled(False)
 
-    def on_cannonball_physics_update(self, x_m, y_m, vx, vy, ax, ay):
+    def on_cannonball_physics_update(self, t, x_m, y_m, vx, vy, ax, ay):
         self.position_horizontal = x_m
         self.position_vertical = y_m
         self.v_horizontal = vx
@@ -353,11 +420,75 @@ class Program(QWidget):
         self.kinetic_energy = 0.5 * self.cannonball_mass * (self.v_total ** 2)
         self.gpe = self.cannonball_mass * self.gravity * max(y_m, 0)
         self.update_cannonball_details_display()
+        self.update_arrows(x_m, y_m, vx, vy, ax, ay)
+
+        self.flight_history.append((t, x_m, y_m, vx, vy, ax, ay))
+        self.timeline_slider.blockSignals(True)
+        self.timeline_slider.setMaximum(len(self.flight_history) - 1)
+        self.timeline_slider.setValue(len(self.flight_history) - 1)
+        self.timeline_slider.blockSignals(False)
+
+    def update_arrows(self, x_m, y_m, vx, vy, ax, ay):
+        centre_px_x = self.origin_x + x_m * self.pixels_per_meter
+        centre_px_y = self.origin_y - y_m * self.pixels_per_meter
+        start = QPointF(centre_px_x, centre_px_y)
+
+        if self.show_velocity_arrows:
+            end = QPointF(centre_px_x + vx * VELOCITY_ARROW_SCALE, centre_px_y - vy * VELOCITY_ARROW_SCALE)
+            self.velocity_arrow.set_vector(start, end)
+            self.velocity_arrow.show_arrow()
+        else:
+            self.velocity_arrow.hide_arrow()
+
+        if self.show_acceleration_arrows:
+            end = QPointF(centre_px_x + ax * ACCELERATION_ARROW_SCALE, centre_px_y - ay * ACCELERATION_ARROW_SCALE)
+            self.acceleration_arrow.set_vector(start, end)
+            self.acceleration_arrow.show_arrow()
+        else:
+            self.acceleration_arrow.hide_arrow()
 
     def on_cannonball_landed(self):
         self.fire_button.setEnabled(True)
+        self.pause_resume_button.setEnabled(False)
         self.update_cannonball_preview()
         self.cannonball_preview.show()
+
+    def toggle_pause_resume(self):
+        if self.flying_cannonball is None:
+            return
+        if self.flying_cannonball.is_paused():
+            self.flying_cannonball.resume()
+            self.pause_resume_button.set_playing_state(True)
+        else:
+            self.flying_cannonball.pause()
+            self.pause_resume_button.set_playing_state(False)
+
+    def on_timeline_pressed(self):
+        if self.flying_cannonball is not None and not self.flying_cannonball.is_paused():
+            self.flying_cannonball.pause()
+            self.pause_resume_button.set_playing_state(False)
+
+    def on_timeline_scrubbed(self, index):
+        if not self.flight_history:
+            return
+        index = min(index, len(self.flight_history) - 1)
+        t, x_m, y_m, vx, vy, ax, ay = self.flight_history[index]
+
+        self.position_horizontal = x_m
+        self.position_vertical = y_m
+        self.v_horizontal = vx
+        self.v_vertical = vy
+        self.v_total = math.hypot(vx, vy)
+        self.a_horizontal = ax
+        self.a_vertical = ay
+        self.a_total = math.hypot(ax, ay)
+        self.kinetic_energy = 0.5 * self.cannonball_mass * (self.v_total ** 2)
+        self.gpe = self.cannonball_mass * self.gravity * max(y_m, 0)
+        self.update_cannonball_details_display()
+        self.update_arrows(x_m, y_m, vx, vy, ax, ay)
+
+        if self.flying_cannonball is not None:
+            self.flying_cannonball.set_state(x_m, y_m)
 
     def update_cannon_position(self):
         height_pixels = int(self.cannon_height * self.pixels_per_meter)
@@ -395,6 +526,13 @@ class Program(QWidget):
         self.cannon.ground_y = self.origin_y + 0
         self.update_cannon_position()
         self.position_fire_button()
+
+        if hasattr(self, "velocity_arrow"):
+            self.velocity_arrow.setGeometry(0, 0, self.width(), self.height())
+            self.acceleration_arrow.setGeometry(0, 0, self.width(), self.height())
+
+        if hasattr(self, "pause_resume_button"):
+            self.position_timeline()
 
         super().resizeEvent(event)
 

@@ -2,20 +2,17 @@ import math
 
 import pymunk
 from PyQt5.QtWidgets import QWidget
-from PyQt5.QtGui import QPainter, QColor, QRadialGradient
-from PyQt5.QtCore import Qt, QTimer, pyqtSignal
+from PyQt5.QtGui import QPainter, QColor, QRadialGradient, QPen, QPolygonF
+from PyQt5.QtCore import Qt, QTimer, QPointF, pyqtSignal
 
 from constants import DEFAULT_DRAG_COEFFICIENT
 
 STEP_INTERVAL_MS = 16
-
 SIMULATION_SPEED = 2.5
-
 CANNONBALL_VISUAL_SCALE = 15
 
 
 class CannonballPreview(QWidget):
-
     def __init__(self, main_window):
         super().__init__(main_window)
         self.main_window = main_window
@@ -46,6 +43,57 @@ class CannonballPreview(QWidget):
         painter.drawEllipse(self.rect())
 
 
+class VectorArrow(QWidget):
+    def __init__(self, parent, color):
+        super().__init__(parent)
+        self.color = color
+        self.start = QPointF(0, 0)
+        self.end = QPointF(0, 0)
+        self.visible_flag = False
+        self.setAttribute(Qt.WA_TransparentForMouseEvents)
+
+    def set_vector(self, start, end):
+        self.start = start
+        self.end = end
+        self.update()
+
+    def show_arrow(self):
+        self.visible_flag = True
+        self.update()
+
+    def hide_arrow(self):
+        if self.visible_flag:
+            self.visible_flag = False
+            self.update()
+
+    def paintEvent(self, event):
+        if not self.visible_flag:
+            return
+
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+
+        pen = QPen(self.color, 3)
+        pen.setCapStyle(Qt.RoundCap)
+        painter.setPen(pen)
+        painter.drawLine(self.start, self.end)
+
+        angle = math.atan2(self.end.y() - self.start.y(), self.end.x() - self.start.x())
+        arrow_size = 10
+        p2 = QPointF(
+            self.end.x() - arrow_size * math.cos(angle - math.pi / 6),
+            self.end.y() - arrow_size * math.sin(angle - math.pi / 6)
+        )
+        p3 = QPointF(
+            self.end.x() - arrow_size * math.cos(angle + math.pi / 6),
+            self.end.y() - arrow_size * math.sin(angle + math.pi / 6)
+        )
+
+        painter.setBrush(self.color)
+        painter.setPen(Qt.NoPen)
+        painter.drawPolygon(QPolygonF([self.end, p2, p3]))
+
+
 class CannonballFlight(QWidget):
     landed = pyqtSignal()
 
@@ -55,6 +103,7 @@ class CannonballFlight(QWidget):
 
         self.mass = mass_kg
         self.radius_m = radius_m
+        self.time_elapsed = 0.0
 
         self.space = pymunk.Space()
         self.space.gravity = (0, 0)
@@ -84,12 +133,12 @@ class CannonballFlight(QWidget):
 
     def _velocity_func(self, body, gravity, damping, dt):
         g = self.main_window.gravity
-        air_density = self.main_window.air_density
 
         vx, vy = body.velocity
         speed = math.hypot(vx, vy)
 
         if self.main_window.air_resistance_enabled:
+            air_density = self.main_window.air_density
             area = math.pi * (self.radius_m ** 2)
             drag_force = 0.5 * air_density * DEFAULT_DRAG_COEFFICIENT * area * (speed ** 2)
 
@@ -117,9 +166,22 @@ class CannonballFlight(QWidget):
     def stop(self):
         self.timer.stop()
 
+    def pause(self):
+        self.timer.stop()
+
+    def resume(self):
+        self.timer.start(STEP_INTERVAL_MS)
+
+    def is_paused(self):
+        return not self.timer.isActive()
+
+    def set_state(self, x_m, y_m):
+        self._reposition(x_m, y_m)
+
     def _step(self):
         dt = (STEP_INTERVAL_MS / 1000) * SIMULATION_SPEED
         self.space.step(dt)
+        self.time_elapsed += dt
 
         x_m, y_m = self.body.position
         vx, vy = self.body.velocity
@@ -128,14 +190,13 @@ class CannonballFlight(QWidget):
         landed = y_m <= ground_level
 
         if landed:
-            x_m = x_m
             y_m = ground_level
             vx, vy = 0.0, 0.0
             self.body.position = (x_m, y_m)
             self.body.velocity = (0, 0)
 
         self._reposition(x_m, y_m)
-        self.main_window.on_cannonball_physics_update(x_m, y_m, vx, vy, self.last_ax, self.last_ay)
+        self.main_window.on_cannonball_physics_update(self.time_elapsed, x_m, y_m, vx, vy, self.last_ax, self.last_ay)
 
         off_screen = self.x() > self.main_window.width() or self.x() + self.width() < 0
         if landed or off_screen:
