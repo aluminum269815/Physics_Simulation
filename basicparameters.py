@@ -13,14 +13,16 @@ class BasicParameters(QWidget):
             QLabel{
                 font-family: Arial;
             }
-        
+
         """)
 
         air_resistance_label = QLabel("Air resistance")
 
         self.air_resistance_checkbox = QCheckBox()
+        self.air_resistance_checkbox.setChecked(main_window.air_resistance_enabled)
+        self.air_resistance_checkbox.stateChanged.connect(self.change_air_resistance)
 
-        air_density_label= QLabel("Air Density")
+        air_density_label = QLabel("Air Density")
 
         self.air_density_slider = QSlider(Qt.Horizontal)
         self.air_density_slider.setMinimum(0)
@@ -59,7 +61,6 @@ class BasicParameters(QWidget):
 
         layout.addLayout(air_resistance_row)
 
-
         layout.addWidget(air_density_label)
 
         air_density_row = QHBoxLayout()
@@ -78,8 +79,11 @@ class BasicParameters(QWidget):
 
         layout.addLayout(gravity_row)
 
-
         self.setLayout(layout)
+
+    def change_air_resistance(self, state):
+        enabled = state == Qt.Checked
+        self.main_window.change_air_resistance_enabled(enabled)
 
     def update_air_density(self, value):
         air_density = value / 1000
@@ -102,7 +106,6 @@ class BasicParameters(QWidget):
         gravity = value / 1000
         self.gravity_input.setText(f"{gravity:.3f}")
         self.main_window.change_gravity_size(gravity)
-
 
     def change_gravity(self):
         try:

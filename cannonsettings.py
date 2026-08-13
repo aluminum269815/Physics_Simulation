@@ -28,7 +28,7 @@ class CannonSettings(QWidget):
         cannonball_mass_label = QLabel("Cannonball Mass")
 
         self.cannonball_mass_slider = QSlider(Qt.Horizontal)
-        self.cannonball_mass_slider.setMinimum(0)
+        self.cannonball_mass_slider.setMinimum(1000)
         self.cannonball_mass_slider.setMaximum(100000)
         self.cannonball_mass_slider.setValue(10000)
 
@@ -56,7 +56,7 @@ class CannonSettings(QWidget):
         cannonball_radius_label = QLabel("Cannonball Radius")
 
         self.cannonball_radius_slider = QSlider(Qt.Horizontal)
-        self.cannonball_radius_slider.setMinimum(0)
+        self.cannonball_radius_slider.setMinimum(1000)
         self.cannonball_radius_slider.setMaximum(100000)
         self.cannonball_radius_slider.setValue(20000)
 

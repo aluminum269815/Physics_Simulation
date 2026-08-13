@@ -43,13 +43,14 @@ class Cannon(QWidget):
         self.head_pivot_x = int(self.head_pixmap.width() * 0.26)
         self.head_pivot_y = int(self.head_pixmap.height() * 0.66)
 
+        self.head_muzzle_x = int(self.head_pixmap.width() * 1.02)
+        self.head_muzzle_y = int(self.head_pixmap.height() * 0.16)
+
         lift_dot_x = int(self.lift_pixmap.width() * 0.674)
         lift_dot_y = int(self.lift_pixmap.height() * 0.058)
 
         self.head_offset_x = lift_dot_x - self.head_pivot_x
         self.head_offset_y = lift_dot_y - self.head_pivot_y
-
-        self.head_offset_x += 5
 
         min_x = min(0, self.head_offset_x)
         min_y = min(0, self.head_offset_y)
@@ -98,6 +99,16 @@ class Cannon(QWidget):
         angle_deg = max(0, min(angle_deg, self.max_firing_angle))
         self.firing_angle = angle_deg
         self.update()
+
+    def muzzle_point(self):
+        angle = math.radians(self.head_tilt_fix - self.firing_angle)
+        dx = self.head_muzzle_x - self.head_pivot_x
+        dy = self.head_muzzle_y - self.head_pivot_y
+        cos_a = math.cos(angle)
+        sin_a = math.sin(angle)
+        local_x = self._head_pivot.x() + dx * cos_a - dy * sin_a
+        local_y = self._head_pivot.y() + dx * sin_a + dy * cos_a
+        return QPoint(self.x() + int(local_x), self.y() + int(local_y))
 
     def paintEvent(self, event):
         painter = QPainter(self)
