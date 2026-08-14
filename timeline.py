@@ -16,9 +16,9 @@ def _darkened(pixmap):
 
 class PauseResumeButton(QPushButton):
     def __init__(self, parent=None,
-                 play_image_path="asset/dark green button.png",
-                 pause_image_path="asset/light red button.png",
-                 pause_hover_image_path="asset/dark red button.png",
+                 play_image_path="assets/dark green button.png",
+                 pause_image_path="assets/light red button.png",
+                 pause_hover_image_path="assets/dark red button.png",
                  height=50):
         super().__init__(parent)
 

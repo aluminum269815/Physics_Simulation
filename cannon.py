@@ -28,8 +28,8 @@ class Cannon(QWidget):
     max_firing_angle = 80
 
     def __init__(self, parent=None,
-                 lift_path="asset/cannonlift&leg.png",
-                 head_path="asset/cannonhead.png",
+                 lift_path="assets/cannonlift&leg.png",
+                 head_path="assets/cannonhead.png",
                  lift_height=110, head_height=70,
                  ground_y=None, top_y=0):
         super().__init__(parent)
