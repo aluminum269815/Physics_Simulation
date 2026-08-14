@@ -178,6 +178,12 @@ class CannonballFlight(QWidget):
     def set_state(self, x_m, y_m):
         self._reposition(x_m, y_m)
 
+    def set_full_state(self, x_m, y_m, vx, vy, time_elapsed):
+        self.body.position = (x_m, y_m)
+        self.body.velocity = (vx, vy)
+        self.time_elapsed = time_elapsed
+        self._reposition(x_m, y_m)
+
     def _step(self):
         dt = (STEP_INTERVAL_MS / 1000) * SIMULATION_SPEED
         self.space.step(dt)

@@ -6,14 +6,21 @@ from cannon import load_autocropped
 
 
 def _load_horizontal(image_path, height):
+    """Loads, autocrops, and rotates a vertical button image so it reads horizontally."""
     pixmap = load_autocropped(image_path)
     if pixmap.isNull():
         return pixmap
-    rotated = pixmap.transformed(QTransform().rotate(90), Qt.SmoothTransformation)
+    rotated = pixmap.transformed(QTransform().rotate(-90), Qt.SmoothTransformation)
     return rotated.scaledToHeight(height, Qt.SmoothTransformation)
 
 
 class FireButton(QPushButton):
+    """
+    The fire button, sitting under the cannon, rotated to sit horizontally.
+    Hovering swaps its image to the dark grey version in the exact same
+    spot (same fixed size for both, so nothing shifts on hover).
+    """
+
     def __init__(self, parent=None,
                  normal_image_path="asset/white fire button.png",
                  hover_image_path="asset/dark grey button.png",

@@ -6,8 +6,6 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 
 from settings import Settings
-from constants import *
-
 from basicparameters import BasicParameters
 from visualdisplay import VisualDisplay
 from cannonsettings import CannonSettings
@@ -64,6 +62,7 @@ class Program(QWidget):
         self.show_velocity_arrows = False
         self.show_acceleration_arrows = False
         self.flight_history = []
+        self.flight_duration_estimate = 0.0
 
         self.recalculate()
 
@@ -110,7 +109,7 @@ class Program(QWidget):
 
         self.timeline_slider = QSlider(Qt.Horizontal, self)
         self.timeline_slider.setMinimum(0)
-        self.timeline_slider.setMaximum(0)
+        self.timeline_slider.setMaximum(1000)
         self.timeline_slider.setEnabled(False)
         self.timeline_slider.sliderPressed.connect(self.on_timeline_pressed)
         self.timeline_slider.valueChanged.connect(self.on_timeline_scrubbed)
@@ -355,16 +354,19 @@ class Program(QWidget):
         self.fire_button.move(x, y)
 
     def position_timeline(self):
-        margin = 15
-        button_size = self.pause_resume_button.height()
-        y = self.height() - button_size - margin
+        margin = 10
+        y = self.fire_button.y()
+        row_height = self.fire_button.height()
 
-        self.pause_resume_button.move(margin, y)
+        pause_size = self.pause_resume_button.height()
+        pause_x = self.fire_button.x() + self.fire_button.width() + margin
+        pause_y = y + (row_height - pause_size) // 2
+        self.pause_resume_button.move(pause_x, pause_y)
 
-        slider_x = margin * 2 + self.pause_resume_button.width()
-        slider_width = max(50, self.width() - slider_x - margin)
         slider_height = 20
-        slider_y = y + (button_size - slider_height) // 2
+        slider_x = pause_x + self.pause_resume_button.width() + margin
+        slider_y = y + (row_height - slider_height) // 2
+        slider_width = max(50, self.width() - slider_x - margin)
         self.timeline_slider.setGeometry(slider_x, slider_y, slider_width, slider_height)
 
     def update_cannonball_preview(self):
@@ -397,9 +399,13 @@ class Program(QWidget):
         self.flying_cannonball.show()
         self.flying_cannonball.raise_()
 
+        discriminant = (velocity_y ** 2) + (2 * self.gravity * start_y_m)
+        t_estimate = (velocity_y + math.sqrt(max(discriminant, 0))) / self.gravity
+        self.flight_duration_estimate = max(0.5, t_estimate * 1.2)
+
         self.flight_history = []
         self.timeline_slider.blockSignals(True)
-        self.timeline_slider.setMaximum(0)
+        self.timeline_slider.setMaximum(1000)
         self.timeline_slider.setValue(0)
         self.timeline_slider.blockSignals(False)
         self.timeline_slider.setEnabled(True)
@@ -425,9 +431,9 @@ class Program(QWidget):
         self.update_arrows(x_m, y_m, vx, vy, ax, ay)
 
         self.flight_history.append((t, x_m, y_m, vx, vy, ax, ay))
+        progress = min(1000, int((t / self.flight_duration_estimate) * 1000)) if self.flight_duration_estimate > 0 else 0
         self.timeline_slider.blockSignals(True)
-        self.timeline_slider.setMaximum(len(self.flight_history) - 1)
-        self.timeline_slider.setValue(len(self.flight_history) - 1)
+        self.timeline_slider.setValue(progress)
         self.timeline_slider.blockSignals(False)
 
     def update_arrows(self, x_m, y_m, vx, vy, ax, ay):
@@ -451,14 +457,35 @@ class Program(QWidget):
 
     def on_cannonball_landed(self):
         self.fire_button.setEnabled(True)
-        self.pause_resume_button.setEnabled(False)
+        self.pause_resume_button.set_playing_state(False)
         self.update_cannonball_preview()
         self.cannonball_preview.show()
+
+        self.timeline_slider.blockSignals(True)
+        self.timeline_slider.setValue(1000)
+        self.timeline_slider.blockSignals(False)
 
     def toggle_pause_resume(self):
         if self.flying_cannonball is None:
             return
         if self.flying_cannonball.is_paused():
+            current_progress = self.timeline_slider.value()
+            target_t = (current_progress / 1000) * self.flight_duration_estimate if self.flight_duration_estimate > 0 else 0
+
+            if self.flight_history:
+                closest_index = min(
+                    range(len(self.flight_history)),
+                    key=lambda i: abs(self.flight_history[i][0] - target_t)
+                )
+                t, x_m, y_m, vx, vy, ax, ay = self.flight_history[closest_index]
+                self.flight_history = self.flight_history[:closest_index + 1]
+                self.flying_cannonball.set_full_state(x_m, y_m, vx, vy, t)
+
+                progress = min(1000, int((t / self.flight_duration_estimate) * 1000)) if self.flight_duration_estimate > 0 else 0
+                self.timeline_slider.blockSignals(True)
+                self.timeline_slider.setValue(progress)
+                self.timeline_slider.blockSignals(False)
+
             self.flying_cannonball.resume()
             self.pause_resume_button.set_playing_state(True)
         else:
@@ -470,11 +497,12 @@ class Program(QWidget):
             self.flying_cannonball.pause()
             self.pause_resume_button.set_playing_state(False)
 
-    def on_timeline_scrubbed(self, index):
-        if not self.flight_history:
+    def on_timeline_scrubbed(self, progress):
+        if not self.flight_history or self.flight_duration_estimate <= 0:
             return
-        index = min(index, len(self.flight_history) - 1)
-        t, x_m, y_m, vx, vy, ax, ay = self.flight_history[index]
+
+        target_t = (progress / 1000) * self.flight_duration_estimate
+        t, x_m, y_m, vx, vy, ax, ay = min(self.flight_history, key=lambda entry: abs(entry[0] - target_t))
 
         self.position_horizontal = x_m
         self.position_vertical = y_m
@@ -491,6 +519,8 @@ class Program(QWidget):
 
         if self.flying_cannonball is not None:
             self.flying_cannonball.set_state(x_m, y_m)
+            self.pause_resume_button.setEnabled(True)
+            self.pause_resume_button.set_playing_state(False)
 
     def update_cannon_position(self):
         height_pixels = int(self.cannon_height * self.pixels_per_meter)
@@ -510,7 +540,7 @@ class Program(QWidget):
         if self.cannon_settings_window is not None and self.cannon_settings_window.isVisible():
             self.cannon_settings_window.sync_cannon_height_display(height_metres)
 
-    def paintEvent(self, event, **kwargs):
+    def paintEvent(self, event):
         painter = QPainter(self)
         scaled = self.background.scaled(self.size(), Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
         painter.drawPixmap(0, 0, scaled)
