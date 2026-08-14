@@ -124,6 +124,11 @@ class Program(QWidget):
 
         self.update_cannonball_preview()
 
+        self.target.show()
+        self.target.raise_()
+        self.target_position_label.show()
+        self.target_position_label.raise_()
+
         self.settings = Settings()
 
         self.settings_panel = QPushButton("   Settings    ▼")
@@ -405,7 +410,7 @@ class Program(QWidget):
 
         discriminant = (velocity_y ** 2) + (2 * self.gravity * start_y_m)
         t_estimate = (velocity_y + math.sqrt(max(discriminant, 0))) / self.gravity
-        self.flight_duration_estimate = max(0.5, t_estimate * 1.2)
+        self.flight_duration_estimate = max(0.5, t_estimate)
 
         self.flight_history = []
         self.timeline_slider.blockSignals(True)
@@ -460,6 +465,8 @@ class Program(QWidget):
         self.update_arrows(x_m, y_m, vx, vy, ax, ay)
 
         self.flight_history.append((t, x_m, y_m, vx, vy, ax, ay))
+        if self.flight_duration_estimate > 0 and t > self.flight_duration_estimate:
+            self.flight_duration_estimate = t
         progress = min(1000, int((t / self.flight_duration_estimate) * 1000)) if self.flight_duration_estimate > 0 else 0
         self.timeline_slider.blockSignals(True)
         self.timeline_slider.setValue(progress)
