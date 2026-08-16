@@ -19,7 +19,7 @@ class PauseResumeButton(QPushButton):
                  play_image_path="assets/dark green button.png",
                  pause_image_path="assets/light red button.png",
                  pause_hover_image_path="assets/dark red button.png",
-                 height=50):
+                 height=32):
         super().__init__(parent)
 
         self._play_normal = load_autocropped(play_image_path).scaledToHeight(height, Qt.SmoothTransformation)

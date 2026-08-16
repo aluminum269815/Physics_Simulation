@@ -9,7 +9,7 @@ class Target(QLabel):
 
     moved = pyqtSignal(int, int)
 
-    def __init__(self, parent=None, image_path="asset/target.png", size=100, ground_y=None):
+    def __init__(self, parent=None, image_path="assets/target.png", size=100, ground_y=None):
         super().__init__(parent)
 
         pixmap = QPixmap(os.path.abspath(image_path))
@@ -65,4 +65,3 @@ class Target(QLabel):
     def moveTo(self, x, y):
         self.move(x, y)
         self.moved.emit(x, y)
-

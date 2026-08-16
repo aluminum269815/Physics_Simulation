@@ -13,12 +13,13 @@ from cannonballdetails import CannonballDetails
 import equations
 from target import Target
 from cannon import Cannon
-from buttons import FireButton, ResetButton
+from buttons import FireButton, ResetButton, SlowDownButton, SpeedUpButton
 from cannonballflying import CannonballFlight, CannonballPreview, VectorArrow
 from timeline import PauseResumeButton
 
 VELOCITY_ARROW_SCALE = 3
 ACCELERATION_ARROW_SCALE = 3
+SPEED_LEVELS = [0.25, 0.5, 1.0, 1.5, 2.0, 3.0, 4.0]
 
 
 class Program(QWidget):
@@ -64,6 +65,10 @@ class Program(QWidget):
         self.flight_history = []
         self.flight_duration_estimate = 0.0
 
+        self.speed_level_index = SPEED_LEVELS.index(1.0)
+        self.simulation_speed_multiplier = SPEED_LEVELS[self.speed_level_index]
+        self.target_hit_this_flight = False
+
         self.recalculate()
 
         self.pixels_per_meter = 2
@@ -105,9 +110,41 @@ class Program(QWidget):
         self.cannonball_preview = CannonballPreview(self)
         self.cannonball_preview.show()
 
+        self.slow_down_button = SlowDownButton(self)
+        self.slow_down_button.clicked.connect(self.slow_down_simulation)
+
         self.pause_resume_button = PauseResumeButton(self)
         self.pause_resume_button.clicked.connect(self.toggle_pause_resume)
         self.pause_resume_button.setEnabled(False)
+
+        self.speed_up_button = SpeedUpButton(self)
+        self.speed_up_button.clicked.connect(self.speed_up_simulation)
+
+        self.speed_label = QLabel(self)
+        self.speed_label.setStyleSheet("""
+            color: #f2f2f2;
+            font-family: Arial;
+            font-weight: bold;
+            font-size: 12px;
+        """)
+        self.update_speed_label()
+
+        self.hit_message_label = QLabel(self)
+        self.hit_message_label.setStyleSheet("""
+            background-color: rgba(255, 255, 255, 235);
+            color: #1a7a1a;
+            font-family: Arial;
+            font-weight: bold;
+            font-size: 16px;
+            padding: 12px 20px;
+            border-radius: 10px;
+            border: 2px solid #1a7a1a;
+        """)
+        self.hit_message_label.hide()
+
+        self.hit_message_timer = QTimer(self)
+        self.hit_message_timer.setSingleShot(True)
+        self.hit_message_timer.timeout.connect(self.hit_message_label.hide)
 
         self.timeline_slider = QSlider(Qt.Horizontal, self)
         self.timeline_slider.setMinimum(0)
@@ -369,9 +406,22 @@ class Program(QWidget):
         self.reset_button.move(x, reset_y)
         x += self.reset_button.width() + margin
 
+        slow_down_y = row_center_y - self.slow_down_button.height() // 2
+        self.slow_down_button.move(x, slow_down_y)
+        x += self.slow_down_button.width() + margin
+
         pause_y = row_center_y - self.pause_resume_button.height() // 2
         self.pause_resume_button.move(x, pause_y)
+
+        speed_label_x = self.pause_resume_button.x() + (self.pause_resume_button.width() - self.speed_label.width()) // 2
+        speed_label_y = self.pause_resume_button.y() + self.pause_resume_button.height() + 4
+        self.speed_label.move(speed_label_x, speed_label_y)
+
         x += self.pause_resume_button.width() + margin
+
+        speed_up_y = row_center_y - self.speed_up_button.height() // 2
+        self.speed_up_button.move(x, speed_up_y)
+        x += self.speed_up_button.width() + margin
 
         slider_height = 20
         slider_y = row_center_y - slider_height // 2
@@ -389,6 +439,10 @@ class Program(QWidget):
             self.flying_cannonball = None
 
         self.cannonball_preview.hide()
+
+        self.target_hit_this_flight = False
+        self.hit_message_timer.stop()
+        self.hit_message_label.hide()
 
         muzzle_px = self.cannon.muzzle_point()
         start_x_m = (muzzle_px.x() - self.origin_x) / self.pixels_per_meter
@@ -431,6 +485,10 @@ class Program(QWidget):
             self.flying_cannonball.deleteLater()
             self.flying_cannonball = None
 
+        self.target_hit_this_flight = False
+        self.hit_message_timer.stop()
+        self.hit_message_label.hide()
+
         self.flight_history = []
         self.flight_duration_estimate = 0.0
 
@@ -449,6 +507,33 @@ class Program(QWidget):
 
         self.update_cannonball_preview()
         self.cannonball_preview.show()
+
+    def update_speed_label(self):
+        multiplier = SPEED_LEVELS[self.speed_level_index]
+        self.speed_label.setText(f"{multiplier:g}x")
+        self.speed_label.adjustSize()
+
+    def speed_up_simulation(self):
+        self.speed_level_index = min(self.speed_level_index + 1, len(SPEED_LEVELS) - 1)
+        self.simulation_speed_multiplier = SPEED_LEVELS[self.speed_level_index]
+        self.update_speed_label()
+        self.position_control_row()
+
+    def slow_down_simulation(self):
+        self.speed_level_index = max(self.speed_level_index - 1, 0)
+        self.simulation_speed_multiplier = SPEED_LEVELS[self.speed_level_index]
+        self.update_speed_label()
+        self.position_control_row()
+
+    def show_hit_message(self):
+        self.hit_message_label.setText("Congratulations! You hit the target!")
+        self.hit_message_label.adjustSize()
+        x = (self.width() - self.hit_message_label.width()) // 2
+        y = int(self.height() * 0.15)
+        self.hit_message_label.move(x, y)
+        self.hit_message_label.show()
+        self.hit_message_label.raise_()
+        self.hit_message_timer.start(3000)
 
     def on_cannonball_physics_update(self, t, x_m, y_m, vx, vy, ax, ay):
         self.position_horizontal = x_m
@@ -471,6 +556,11 @@ class Program(QWidget):
         self.timeline_slider.blockSignals(True)
         self.timeline_slider.setValue(progress)
         self.timeline_slider.blockSignals(False)
+
+        if not self.target_hit_this_flight and self.flying_cannonball is not None:
+            if self.flying_cannonball.geometry().intersects(self.target.geometry()):
+                self.target_hit_this_flight = True
+                self.show_hit_message()
 
     def update_arrows(self, x_m, y_m, vx, vy, ax, ay):
         centre_px_x = self.origin_x + x_m * self.pixels_per_meter

@@ -22,12 +22,12 @@ def _darkened(pixmap):
     return result
 
 
-class FireButton(QPushButton):
-    def __init__(self, parent=None, image_path="assets/white fire button.png", height=50):
+class _ImageHoverButton(QPushButton):
+    def __init__(self, parent, normal_pixmap, hover_pixmap):
         super().__init__(parent)
 
-        self._normal_pixmap = _load_horizontal(image_path, height)
-        self._hover_pixmap = _darkened(self._normal_pixmap) if not self._normal_pixmap.isNull() else self._normal_pixmap
+        self._normal_pixmap = normal_pixmap
+        self._hover_pixmap = hover_pixmap
 
         self.setIcon(QIcon(self._normal_pixmap))
         self.setIconSize(self._normal_pixmap.size())
@@ -55,30 +55,38 @@ class FireButton(QPushButton):
         super().leaveEvent(event)
 
 
-BUTTON_STYLE = """
-    QPushButton {
-        background-color: #f2f2f2;
-        color: #1a1a1a;
-        border: 2px solid #8a8a8a;
-        border-radius: 10px;
-        padding: 8px 20px;
-        font-family: Arial;
-        font-weight: bold;
-        font-size: 13px;
-    }
-    QPushButton:hover {
-        background-color: #a8a8a8;
-    }
-    QPushButton:disabled {
-        background-color: #dcdcdc;
-        color: #9a9a9a;
-        border-color: #bfbfbf;
-    }
-"""
+class FireButton(_ImageHoverButton):
+    def __init__(self, parent=None, image_path="assets/white fire button.png", height=50):
+        normal_pixmap = _load_horizontal(image_path, height)
+        hover_pixmap = _darkened(normal_pixmap) if not normal_pixmap.isNull() else normal_pixmap
+        super().__init__(parent, normal_pixmap, hover_pixmap)
 
-class ResetButton(QPushButton):
-    def __init__(self, parent=None):
-        super().__init__("RESET", parent)
-        self.setCursor(Qt.PointingHandCursor)
-        self.setStyleSheet(BUTTON_STYLE)
-        self.adjustSize()
+
+class ResetButton(_ImageHoverButton):
+    def __init__(self, parent=None,
+                 normal_image_path="assets/resetlightgrey.png",
+                 hover_image_path="assets/resetdarkgrey.png",
+                 height=50):
+        normal_pixmap = load_autocropped(normal_image_path).scaledToHeight(height, Qt.SmoothTransformation)
+        hover_pixmap = load_autocropped(hover_image_path).scaledToHeight(height, Qt.SmoothTransformation)
+        super().__init__(parent, normal_pixmap, hover_pixmap)
+
+
+class SlowDownButton(_ImageHoverButton):
+    def __init__(self, parent=None,
+                 normal_image_path="assets/going back light grey button.png",
+                 hover_image_path="assets/going back dark grey button.png",
+                 height=28):
+        normal_pixmap = load_autocropped(normal_image_path).scaledToHeight(height, Qt.SmoothTransformation)
+        hover_pixmap = load_autocropped(hover_image_path).scaledToHeight(height, Qt.SmoothTransformation)
+        super().__init__(parent, normal_pixmap, hover_pixmap)
+
+
+class SpeedUpButton(_ImageHoverButton):
+    def __init__(self, parent=None,
+                 normal_image_path="assets/speed up light grey button.png",
+                 hover_image_path="assets/speed up dark grey button.png",
+                 height=28):
+        normal_pixmap = load_autocropped(normal_image_path).scaledToHeight(height, Qt.SmoothTransformation)
+        hover_pixmap = load_autocropped(hover_image_path).scaledToHeight(height, Qt.SmoothTransformation)
+        super().__init__(parent, normal_pixmap, hover_pixmap)

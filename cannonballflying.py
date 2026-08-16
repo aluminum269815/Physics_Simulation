@@ -8,7 +8,7 @@ from PyQt5.QtCore import Qt, QTimer, QPointF, pyqtSignal
 from constants import DEFAULT_DRAG_COEFFICIENT
 
 STEP_INTERVAL_MS = 16
-SIMULATION_SPEED = 2.5
+BASE_SIMULATION_SPEED = 2.5
 CANNONBALL_VISUAL_SCALE = 15
 
 
@@ -185,7 +185,7 @@ class CannonballFlight(QWidget):
         self._reposition(x_m, y_m)
 
     def _step(self):
-        dt = (STEP_INTERVAL_MS / 1000) * SIMULATION_SPEED
+        dt = (STEP_INTERVAL_MS / 1000) * BASE_SIMULATION_SPEED * self.main_window.simulation_speed_multiplier
         self.space.step(dt)
         self.time_elapsed += dt
 
