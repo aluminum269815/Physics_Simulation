@@ -5,7 +5,7 @@ from PyQt5.QtCore import Qt
 from cannon import load_autocropped
 
 
-def _darkened(pixmap):
+def darkened(pixmap):
     result = pixmap.copy()
     painter = QPainter(result)
     painter.setCompositionMode(QPainter.CompositionMode_SourceAtop)
@@ -23,7 +23,7 @@ class PauseResumeButton(QPushButton):
         super().__init__(parent)
 
         self._play_normal = load_autocropped(play_image_path).scaledToHeight(height, Qt.SmoothTransformation)
-        self._play_hover = _darkened(self._play_normal)
+        self._play_hover = darkened(self._play_normal)
         self._pause_normal = load_autocropped(pause_image_path).scaledToHeight(height, Qt.SmoothTransformation)
         self._pause_hover = load_autocropped(pause_hover_image_path).scaledToHeight(height, Qt.SmoothTransformation)
 

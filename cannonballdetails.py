@@ -8,8 +8,9 @@ class CannonballDetails(QWidget):
         super().__init__(main_window, Qt.Window)
         self.main_window = main_window
         self.setWindowTitle("Cannonball Details")
-        self.setFixedSize(550, 400)
+        self.setFixedSize(600, 400)
         self.setStyleSheet("font-family: Arial;")
+        self.setStyleSheet("font-size: 15px;")
 
 
         cannonball_title_label = QLabel("Cannonball Details")
@@ -17,14 +18,14 @@ class CannonballDetails(QWidget):
         self.cannonball_radius_info = QLabel("Cannonball Radius:__cm")
 
         v_title_label = QLabel("Velocity")
-        self.v_hori_info = QLabel("v<sub>horizontal</sub>:__m/s<sup>-1</sup>")
-        self.v_vert_info = QLabel("v<sub>vertical</sub>:__m/s<sup>-1</sup>")
-        self.v_total_info = QLabel("v<sub>total</sub>:__m/s<sup>-1</sup>")
+        self.v_hori_info = QLabel("v<sub>horizontal</sub>:__m/s<sup>1</sup>")
+        self.v_vert_info = QLabel("v<sub>vertical</sub>:__m/s<sup>1</sup>")
+        self.v_total_info = QLabel("v<sub>total</sub>:__m/s<sup>1</sup>")
 
         a_title_label = QLabel("Acceleration")
-        self.a_hori_info = QLabel("a<sub>horizontal</sub>:__m/s<sup>-2</sup>")
-        self.a_vert_info = QLabel("a<sub>vertical</sub>:__m/s<sup>-2</sup>")
-        self.a_total_info = QLabel("a<sub>total</sub>:__m/s<sup>-2</sup>")
+        self.a_hori_info = QLabel("a<sub>horizontal</sub>:__m/s<sup>2</sup>")
+        self.a_vert_info = QLabel("a<sub>vertical</sub>:__m/s<sup>2</sup>")
+        self.a_total_info = QLabel("a<sub>total</sub>:__m/s<sup>2</sup>")
 
         e_title_label = QLabel("Energy")
         self.ke_info = QLabel("Kinetic Energy:__j")
@@ -97,13 +98,13 @@ class CannonballDetails(QWidget):
         self.cannonball_mass_info.setText(f"Cannonball Mass:{mw.cannonball_mass:.2f}kg")
         self.cannonball_radius_info.setText(f"Cannonball Radius:{mw.cannonball_radius:.2f}cm")
 
-        self.v_hori_info.setText(f"v<sub>horizontal</sub>:{mw.v_horizontal:.2f}m/s<sup>-1</sup>")
-        self.v_vert_info.setText(f"v<sub>vertical</sub>:{mw.v_vertical:.2f}m/s<sup>-1</sup>")
-        self.v_total_info.setText(f"v<sub>total</sub>:{mw.v_total:.2f}m/s<sup>-1</sup>")
+        self.v_hori_info.setText(f"v<sub>horizontal</sub>:{mw.v_horizontal:.2f}m/s<sup>1</sup>")
+        self.v_vert_info.setText(f"v<sub>vertical</sub>:{mw.v_vertical:.2f}m/s<sup>1</sup>")
+        self.v_total_info.setText(f"v<sub>total</sub>:{mw.v_total:.2f}m/s<sup>1</sup>")
 
-        self.a_hori_info.setText(f"a<sub>horizontal</sub>:{mw.a_horizontal:.2f}m/s<sup>-2</sup>")
-        self.a_vert_info.setText(f"a<sub>vertical</sub>:{mw.a_vertical:.2f}m/s<sup>-2</sup>")
-        self.a_total_info.setText(f"a<sub>total</sub>:{mw.a_total:.2f}m/s<sup>-2</sup>")
+        self.a_hori_info.setText(f"a<sub>horizontal</sub>:{mw.a_horizontal:.2f}m/s<sup>2</sup>")
+        self.a_vert_info.setText(f"a<sub>vertical</sub>:{mw.a_vertical:.2f}m/s<sup>2</sup>")
+        self.a_total_info.setText(f"a<sub>total</sub>:{mw.a_total:.2f}m/s<sup>2</sup>")
 
         self.ke_info.setText(f"Kinetic Energy:{mw.kinetic_energy:.2f}j")
         self.gpe_info.setText(f"Gravitational Potential Energy:{mw.gpe:.2f}j")

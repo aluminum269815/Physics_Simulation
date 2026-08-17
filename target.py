@@ -3,6 +3,7 @@ import os
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
+from paths import resource_path
 
 
 class Target(QLabel):
@@ -12,7 +13,7 @@ class Target(QLabel):
     def __init__(self, parent=None, image_path="assets/target.png", size=100, ground_y=None):
         super().__init__(parent)
 
-        pixmap = QPixmap(os.path.abspath(image_path))
+        pixmap = QPixmap(resource_path(image_path))
         pixmap = pixmap.scaled(size, size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
 
         self.setPixmap(pixmap)

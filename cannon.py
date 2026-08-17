@@ -5,10 +5,11 @@ import math
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtGui import QPixmap, QPainter, QBitmap, QRegion
 from PyQt5.QtCore import Qt, QPoint, QPointF, pyqtSignal
+from paths import resource_path
 
 
 def load_autocropped(path):
-    full_path = os.path.abspath(path)
+    full_path = resource_path(path)
     pixmap = QPixmap(full_path)
 
     image = pixmap.toImage()

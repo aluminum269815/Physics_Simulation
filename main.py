@@ -16,6 +16,7 @@ from cannon import Cannon
 from buttons import FireButton, ResetButton, SlowDownButton, SpeedUpButton
 from cannonballflying import CannonballFlight, CannonballPreview, VectorArrow
 from timeline import PauseResumeButton
+from paths import resource_path
 
 VELOCITY_ARROW_SCALE = 3
 ACCELERATION_ARROW_SCALE = 3
@@ -26,7 +27,8 @@ class Program(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Projectile Motion sim")
-        self.background = QPixmap(os.path.abspath("assets/background.png"))
+        self.background = QPixmap(resource_path("assets/background.png"))
+        self.setWindowIcon(QIcon("assets/image1.ico"))
         self.resize(1100, 650)
         self.setStyleSheet("""
             QLabel{
@@ -418,7 +420,6 @@ class Program(QWidget):
         self.speed_label.move(speed_label_x, speed_label_y)
 
         x += self.pause_resume_button.width() + margin
-
         speed_up_y = row_center_y - self.speed_up_button.height() // 2
         self.speed_up_button.move(x, speed_up_y)
         x += self.speed_up_button.width() + margin
