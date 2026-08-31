@@ -39,7 +39,7 @@ class BasicParameters(SettingWindow):
         self.air_density_slider = QSlider(Qt.Horizontal)
         self.air_density_slider.setRange(0, int(MAX_SLIDER_AIR_DENSITY * 1000))
         self.air_density_slider.setValue(int(self.settings.air_density * 1000))
-        self.air_density_slider.valueChanged.connect(self.change_slider_air_density)
+        self.air_density_slider.sliderMoved.connect(self.change_slider_air_density)
 
         self.air_density_input = QLineEdit()
         self.air_density_input.setText(str(self.settings.air_density))
@@ -54,7 +54,7 @@ class BasicParameters(SettingWindow):
         self.gravity_slider = QSlider(Qt.Horizontal)
         self.gravity_slider.setRange(0, int(MAX_SLIDER_GRAVITY * 100))
         self.gravity_slider.setValue(int(self.settings.gravity * 100))
-        self.gravity_slider.valueChanged.connect(self.change_slider_gravity)
+        self.gravity_slider.sliderMoved.connect(self.change_slider_gravity)
 
         self.gravity_input = QLineEdit()
         self.gravity_input.setText(str(self.settings.gravity))
@@ -187,7 +187,7 @@ class CannonSettings(SettingWindow):
         self.initial_velocity_slider = QSlider(Qt.Horizontal)
         self.initial_velocity_slider.setRange(int(MIN_INITIAL_VELOCITY * 10), int(MAX_SLIDER_INITIAL_VELOCITY * 10))
         self.initial_velocity_slider.setValue(int(self.settings.initial_velocity * 10))
-        self.initial_velocity_slider.valueChanged.connect(self.change_slider_initial_velocity)
+        self.initial_velocity_slider.sliderMoved.connect(self.change_slider_initial_velocity)
 
         self.initial_velocity_input = QLineEdit()
         self.initial_velocity_input.setText(str(self.settings.initial_velocity))
@@ -202,7 +202,7 @@ class CannonSettings(SettingWindow):
         self.cannonball_mass_slider = QSlider(Qt.Horizontal)
         self.cannonball_mass_slider.setRange(int(MIN_CANNONBALL_MASS * 10), int(MAX_SLIDER_CANNONBALL_MASS * 10))
         self.cannonball_mass_slider.setValue(int(self.settings.cannonball_mass * 10))
-        self.cannonball_mass_slider.valueChanged.connect(self.change_slider_cannonball_mass)
+        self.cannonball_mass_slider.sliderMoved.connect(self.change_slider_cannonball_mass)
 
         self.cannonball_mass_input = QLineEdit()
         self.cannonball_mass_input.setText(str(self.settings.cannonball_mass))
@@ -217,7 +217,7 @@ class CannonSettings(SettingWindow):
         self.cannon_height_slider = QSlider(Qt.Horizontal)
         self.cannon_height_slider.setRange(0, int(MAX_CANNON_HEIGHT * 10))
         self.cannon_height_slider.setValue(int(self.settings.cannon_height * 10))
-        self.cannon_height_slider.valueChanged.connect(self.change_slider_cannon_height)
+        self.cannon_height_slider.sliderMoved.connect(self.change_slider_cannon_height)
 
         self.cannon_height_input = QLineEdit()
         self.cannon_height_input.setText(str(self.settings.cannon_height * 10))
@@ -232,7 +232,7 @@ class CannonSettings(SettingWindow):
         self.cannonball_radius_slider = QSlider(Qt.Horizontal)
         self.cannonball_radius_slider.setRange(int(MIN_CANNONBALL_RADIUS * 10), int(MAX_SLIDER_CANNONBALL_RADIUS * 10))
         self.cannonball_radius_slider.setValue(int(self.settings.cannonball_radius * 10))
-        self.cannonball_radius_slider.valueChanged.connect(self.change_slider_cannonball_radius)
+        self.cannonball_radius_slider.sliderMoved.connect(self.change_slider_cannonball_radius)
 
         self.cannonball_radius_input = QLineEdit()
         self.cannonball_radius_input.setText(str(self.settings.cannonball_radius))
@@ -247,7 +247,7 @@ class CannonSettings(SettingWindow):
         self.firing_angle_slider = QSlider(Qt.Horizontal)
         self.firing_angle_slider.setRange(MIN_FIRING_ANGLE, MAX_FIRING_ANGLE)
         self.firing_angle_slider.setValue(self.settings.firing_angle)
-        self.firing_angle_slider.valueChanged.connect(self.change_slider_firing_angle)
+        self.firing_angle_slider.sliderMoved.connect(self.change_slider_firing_angle)
 
         self.firing_angle_input = QLineEdit()
         self.firing_angle_input.setText(str(self.settings.firing_angle))

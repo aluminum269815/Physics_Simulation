@@ -178,6 +178,6 @@ class CannonBall(QLabel):
         self.energy_loss = round(self.initial_total_energy - self.current_total_energy, 0)
 
     def update_position(self):
-        x = WALL_WIDTH + CANNONBALL_OFFSET + self.current_distance * PIXELS_PER_METRE - self.width() // 2
+        x = WALL_WIDTH + CANNON_WIDTH + self.current_distance * PIXELS_PER_METRE - self.width() // 2
         y = GROUND_Y - self.current_height * PIXELS_PER_METRE - self.height() // 2
         self.move(int(x), int(y))

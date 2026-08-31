@@ -8,7 +8,7 @@ from constants import *
 from functions import load_image
 from target import Target, TargetLabel
 from setting_windows import BasicParameters, VisualDisplay, CannonSettings, CannonballDetails
-from cannon import CannonBase, CannonBarrel
+from cannon import CannonPlatform, CannonBase, CannonBarrel
 from cannonball import CannonBall
 from buttons import FireButton, PauseButton, ResetButton
 from timeline import Timeline
@@ -37,6 +37,7 @@ class Program(QWidget):
         self.setting_windows = {'Basic Parameters': BasicParameters(self), 'Visual Display': VisualDisplay(self),
                                 'Cannon Settings': CannonSettings(self), 'Cannonball Details': CannonballDetails(self)}
 
+        self.cannon_platform = CannonPlatform(self)
         self.cannon_base = CannonBase(self)
         self.cannon_barrel = CannonBarrel(self)
 
@@ -138,13 +139,22 @@ class Program(QWidget):
 
     def change_cannon_height(self, height):
         self.settings.set_cannon_height(height)
+        self.cannon_platform.update_position()
         self.cannon_base.update_position()
         self.cannon_barrel.update_position()
         self.setting_windows['Cannon Settings'].update_cannon_height()
 
+    def change_dragging_firing_angle(self, firing_angle):
+        self.settings.set_firing_angle(firing_angle)
+        self.cannon_barrel.update_angle()
+        self.cannon_barrel.update_position()
+        self.setting_windows['Cannon Settings'].update_firing_angle()
+
     def change_firing_angle(self, firing_angle):
         self.settings.set_firing_angle(firing_angle)
         self.cannon_barrel.update_angle()
+        self.cannon_platform.update_position()
+        self.cannon_base.update_position()
         self.cannon_barrel.update_position()
         self.setting_windows['Cannon Settings'].update_firing_angle()
 
@@ -206,18 +216,18 @@ class Program(QWidget):
     def paintEvent(self, event, **kwargs):
         self.update()
         painter = QPainter(self)
-        wall = self.wall_image.scaled(WALL_WIDTH, WINDOW_HEIGHT - GROUND_HEIGHT, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
+        wall = self.wall_image.scaled(WALL_WIDTH, WINDOW_HEIGHT, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
         background = self.background_image.scaled(WINDOW_WIDTH - WALL_WIDTH, WINDOW_HEIGHT - GROUND_HEIGHT, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
         painter.drawPixmap(0, 0, wall)
         painter.drawPixmap(WALL_WIDTH, 0, background)
-        painter.fillRect(0, GROUND_Y, WINDOW_WIDTH, GROUND_HEIGHT, QColor(*GROUND_COLOR))
+        painter.fillRect(WALL_WIDTH + CANNON_WIDTH + 10, GROUND_Y, WINDOW_WIDTH, GROUND_HEIGHT, QColor(*GROUND_COLOR))
 
         if self.settings.showing_trajectory:
             for cannonball in self.cannonballs:
                 positions = [(cannonball.data_lists['x'][time], cannonball.data_lists['y'][time]) for time in
                              range(0, cannonball.time_index + 1, 5)]
                 positions.append((cannonball.data_lists['x'][cannonball.time_index], cannonball.data_lists['y'][cannonball.time_index]))
-                points = QPolygon([QPoint(int(position[0] * PIXELS_PER_METRE + WALL_WIDTH + CANNONBALL_OFFSET),
+                points = QPolygon([QPoint(int(position[0] * PIXELS_PER_METRE + WALL_WIDTH + CANNON_WIDTH),
                                           int(GROUND_Y - position[1] * PIXELS_PER_METRE)) for position in positions])
                 painter.setRenderHint(QPainter.Antialiasing)
                 painter.setPen(QPen(Qt.red if cannonball.air_resistance_enabled else Qt.blue, 3))

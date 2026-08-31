@@ -7,6 +7,48 @@ from constants import *
 from functions import load_image
 
 
+class CannonPlatform(QLabel):
+    def __init__(self, program):
+        super().__init__(program)
+        self.program = program
+        self.settings = self.program.settings
+
+        self.image = load_image("cannon_platform.png")
+        self.setPixmap(self.image)
+        self.setFixedSize(self.image.size())
+        self.setCursor(Qt.OpenHandCursor)
+
+        self.dragging = False
+        self.drag_y = None
+
+        self.update_position()
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.dragging = True
+            self.drag_y = event.globalY()
+            self.setCursor(Qt.ClosedHandCursor)
+
+    def mouseMoveEvent(self, event):
+        if self.dragging:
+            height_change = round((self.drag_y - event.globalY()) / PIXELS_PER_METRE, 1)
+            self.program.change_cannon_height(self.settings.cannon_height + height_change)
+            self.drag_y = event.globalY()
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.dragging = False
+            self.setCursor(Qt.OpenHandCursor)
+
+    def update_position(self):
+        barrel_offset_y = (CANNON_BARREL_LENGTH - CANNON_BARREL_PIVOT_OFFSET_X) * math.sin(math.radians(self.settings.firing_angle)) \
+            + CANNON_BARREL_MUZZLE_OFFSET * math.cos(math.radians(self.settings.firing_angle))
+        y = self.program.height() - GROUND_HEIGHT + CANNON_BASE_HEIGHT \
+            - self.settings.cannon_height * PIXELS_PER_METRE + barrel_offset_y - CANNON_BASE_PIVOT_OFFSET_Y
+
+        self.move(WALL_WIDTH, int(y))
+
+
 class CannonBase(QLabel):
     def __init__(self, program):
         super().__init__(program)
@@ -41,8 +83,13 @@ class CannonBase(QLabel):
             self.setCursor(Qt.OpenHandCursor)
 
     def update_position(self):
-        y = self.program.height() - GROUND_HEIGHT - self.settings.cannon_height * PIXELS_PER_METRE - self.height()
-        self.move(WALL_WIDTH, int(y))
+        barrel_offset_x = (CANNON_BARREL_LENGTH - CANNON_BARREL_PIVOT_OFFSET_X) * math.cos(math.radians(self.settings.firing_angle)) \
+            - CANNON_BARREL_MUZZLE_OFFSET * math.sin(math.radians(self.settings.firing_angle))
+        x = WALL_WIDTH + CANNON_WIDTH - CANNON_BASE_PIVOT_OFFSET_X - barrel_offset_x
+
+        y = self.program.cannon_platform.y() - self.height()
+
+        self.move(int(x), int(y))
 
 
 class CannonBarrel(QLabel):
@@ -92,9 +139,12 @@ class CannonBarrel(QLabel):
             pivot_x = self.program.cannon_base.x() + CANNON_BASE_PIVOT_OFFSET_X
             pivot_y = self.program.cannon_base.y() + CANNON_BASE_PIVOT_OFFSET_Y
             angle = int(math.degrees(math.atan2(pivot_y - drag_pos.y(), drag_pos.x() - pivot_x)))
-            self.program.change_firing_angle(angle)
+            self.program.change_dragging_firing_angle(angle)
 
     def mouseReleaseEvent(self, event):
         if event.button() == Qt.LeftButton:
             self.dragging = False
             self.setCursor(Qt.OpenHandCursor)
+            self.program.cannon_platform.update_position()
+            self.program.cannon_base.update_position()
+            self.update_position()
