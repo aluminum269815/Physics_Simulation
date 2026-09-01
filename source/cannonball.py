@@ -75,6 +75,9 @@ class CannonBall(QLabel):
         self.create_image()
         self.update()
 
+    def __getitem__(self, item):
+        return self.data_lists[item][self.time_index]
+
     def calculate_data_lists(self):
         if self.air_resistance_enabled:
             drag_constant = round(0.5 * self.air_density * self.drag_coefficient * self.radius ** 2 * math.pi, 5)

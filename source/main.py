@@ -1,6 +1,6 @@
 import sys
 from PyQt5.QtWidgets import QWidget, QPushButton, QFrame, QVBoxLayout, QApplication
-from PyQt5.QtGui import QPainter, QColor,QPolygon, QPen
+from PyQt5.QtGui import QPainter, QColor, QPolygon, QPen, QTransform
 from PyQt5.QtCore import Qt, QTimer, QPoint
 
 from settings import Settings
@@ -21,6 +21,9 @@ class Program(QWidget):
         self.setWindowTitle("Projectile Motion sim")
         self.background_image = load_image('background.png')
         self.wall_image = load_image('wall.png')
+        self.velocity_arrow = load_image('velocity_arrow.png')
+        self.acceleration_arrow = load_image('acceleration_arrow.png')
+
         self.setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT)
         self.setStyleSheet("""
             QLabel{
@@ -222,8 +225,8 @@ class Program(QWidget):
         painter.drawPixmap(WALL_WIDTH, 0, background)
         painter.fillRect(WALL_WIDTH + CANNON_WIDTH + 50, GROUND_Y, WINDOW_WIDTH, GROUND_HEIGHT, QColor(*GROUND_COLOR))
 
-        if self.settings.showing_trajectory:
-            for cannonball in self.cannonballs:
+        for cannonball in self.cannonballs:
+            if self.settings.showing_trajectory:
                 positions = [(cannonball.data_lists['x'][time], cannonball.data_lists['y'][time]) for time in
                              range(0, cannonball.time_index + 1, 5)]
                 positions.append((cannonball.data_lists['x'][cannonball.time_index], cannonball.data_lists['y'][cannonball.time_index]))
@@ -232,6 +235,58 @@ class Program(QWidget):
                 painter.setRenderHint(QPainter.Antialiasing)
                 painter.setPen(QPen(Qt.red if cannonball.air_resistance_enabled else Qt.blue, 3))
                 painter.drawPolyline(points)
+
+            if self.settings.showing_velocity_arrows:
+                horizontal_velocity_arrow = self.velocity_arrow.scaled(int(80 * cannonball.current_horizontal_velocity / VELOCITY_ARROW_SCALE), 11)
+                painter.drawPixmap(int(cannonball.x() + cannonball.width() / 2),
+                                   int(cannonball.y() + cannonball.height() / 2 - 5),
+                                       horizontal_velocity_arrow)
+
+                vertical_velocity_arrow = self.velocity_arrow.scaled(int(80 * abs(cannonball.current_vertical_velocity) / VELOCITY_ARROW_SCALE), 11)
+                transform = QTransform()
+                transform.rotate(-90 if cannonball.current_vertical_velocity > 0 else 90)
+                vertical_velocity_arrow = vertical_velocity_arrow.transformed(transform, Qt.SmoothTransformation)
+                painter.drawPixmap(int(cannonball.x() + cannonball.width() / 2 - 5),
+                                   int(cannonball.y() + cannonball.height() / 2 \
+                                    - (vertical_velocity_arrow.height() if cannonball.current_vertical_velocity > 0 else 0)),
+                                   vertical_velocity_arrow)
+
+                total_velocity_arrow = self.velocity_arrow.scaled(int(80 * abs(cannonball.current_total_velocity) / VELOCITY_ARROW_SCALE), 11)
+                transform = QTransform()
+                transform.rotate(int(-cannonball.current_moving_direction))
+                total_velocity_arrow = total_velocity_arrow.transformed(transform, Qt.SmoothTransformation)
+                painter.drawPixmap(int(cannonball.x() + cannonball.width() / 2),
+                                   int(cannonball.y() + cannonball.height() / 2 \
+                                    - (total_velocity_arrow.height() if cannonball.current_vertical_velocity > 0 else 0)),
+                                   total_velocity_arrow)
+
+            if self.settings.showing_acceleration_arrows:
+                horizontal_acceleration_arrow = self.acceleration_arrow.scaled(int(80 * abs(cannonball.current_horizontal_acceleration) / ACCELERATION_ARROW_SCALE), 11)
+                transform = QTransform()
+                transform.rotate(180)
+                horizontal_acceleration_arrow = horizontal_acceleration_arrow.transformed(transform, Qt.SmoothTransformation)
+                painter.drawPixmap(int(cannonball.x() + cannonball.width() / 2 - horizontal_acceleration_arrow.width()),
+                                   int(cannonball.y() + cannonball.height() / 2 - 5),
+                                       horizontal_acceleration_arrow)
+
+                vertical_acceleration_arrow = self.acceleration_arrow.scaled(int(80 * abs(cannonball.current_vertical_acceleration) / ACCELERATION_ARROW_SCALE), 11)
+                transform = QTransform()
+                transform.rotate(-90 if cannonball.current_vertical_acceleration > 0 else 90)
+                vertical_acceleration_arrow = vertical_acceleration_arrow.transformed(transform, Qt.SmoothTransformation)
+                painter.drawPixmap(int(cannonball.x() + cannonball.width() / 2 - 5),
+                                   int(cannonball.y() + cannonball.height() / 2 \
+                                    - (vertical_acceleration_arrow.height() if cannonball.current_vertical_acceleration > 0 else 0)),
+                                   vertical_acceleration_arrow)
+
+                total_acceleration_arrow = self.acceleration_arrow.scaled(int(80 * abs(cannonball.current_total_acceleration) / ACCELERATION_ARROW_SCALE), 11)
+                transform = QTransform()
+                transform.rotate(int(-cannonball.current_accelerating_direction))
+                total_acceleration_arrow = total_acceleration_arrow.transformed(transform, Qt.SmoothTransformation)
+                painter.drawPixmap(int(cannonball.x() + cannonball.width() / 2 - total_acceleration_arrow.width()),
+                                   int(cannonball.y() + cannonball.height() / 2),
+                                   total_acceleration_arrow)
+
+
 
         painter.end()
 
