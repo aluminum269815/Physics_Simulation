@@ -395,19 +395,19 @@ class CannonballDetails(SettingWindow):
 
         row = QHBoxLayout()
         row.addWidget(QLabel('Gravity:'), 2, alignment=Qt.AlignRight)
-        self.gravity_info = QLabel('__m/s<sup>-2</sup>')
+        self.gravity_info = QLabel('__ m/s<sup>-2</sup>')
         row.addWidget(self.gravity_info, 1, alignment=Qt.AlignHCenter)
         layout.addLayout(row)
 
         row = QHBoxLayout()
         row.addWidget(QLabel('Air resistance enabled:'), 2, alignment=Qt.AlignRight)
-        self.air_resistance_enabled_info = QLabel('__')
+        self.air_resistance_enabled_info = QLabel('N/A')
         row.addWidget(self.air_resistance_enabled_info, 1, alignment=Qt.AlignHCenter)
         layout.addLayout(row)
 
         row = QHBoxLayout()
         row.addWidget(QLabel('Air Density:'), 2, alignment=Qt.AlignRight)
-        self.air_density_info = QLabel('__kg/m<sup>-3<sup>')
+        self.air_density_info = QLabel('__ kg/m<sup>-3<sup>')
         row.addWidget(self.air_density_info, 1, alignment=Qt.AlignHCenter)
         layout.addLayout(row)
 
@@ -415,25 +415,25 @@ class CannonballDetails(SettingWindow):
 
         row = QHBoxLayout()
         row.addWidget(QLabel('Mass:'), 2, alignment=Qt.AlignRight)
-        self.mass_info = QLabel('__kg')
+        self.mass_info = QLabel('__ kg')
         row.addWidget(self.mass_info, 1, alignment=Qt.AlignHCenter)
         layout.addLayout(row)
 
         row = QHBoxLayout()
         row.addWidget(QLabel('Radius:'), 2, alignment=Qt.AlignRight)
-        self.radius_info = QLabel('__m')
+        self.radius_info = QLabel('__ m')
         row.addWidget(self.radius_info, 1, alignment=Qt.AlignHCenter)
         layout.addLayout(row)
 
         row = QHBoxLayout()
         row.addWidget(QLabel('Firing Time:'), 2, alignment=Qt.AlignRight)
-        self.firing_time_info = QLabel('__s')
+        self.firing_time_info = QLabel('__ s')
         row.addWidget(self.firing_time_info, 1, alignment=Qt.AlignHCenter)
         layout.addLayout(row)
 
         row = QHBoxLayout()
         row.addWidget(QLabel('Time After Firing:'), 2, alignment=Qt.AlignRight)
-        self.time_after_firing_info = QLabel('__s')
+        self.time_after_firing_info = QLabel('__ s')
         row.addWidget(self.time_after_firing_info, 1, alignment=Qt.AlignHCenter)
         layout.addLayout(row)
 
@@ -441,19 +441,19 @@ class CannonballDetails(SettingWindow):
 
         row = QHBoxLayout()
         row.addWidget(QLabel('Initial Height:'), 2, alignment=Qt.AlignRight)
-        self.initial_height_info = QLabel('__m')
+        self.initial_height_info = QLabel('__ m')
         row.addWidget(self.initial_height_info, 1, alignment=Qt.AlignHCenter)
         layout.addLayout(row)
 
         row = QHBoxLayout()
         row.addWidget(QLabel('Current Distance:'), 2, alignment=Qt.AlignRight)
-        self.current_distance_info = QLabel('__m')
+        self.current_distance_info = QLabel('__ m')
         row.addWidget(self.current_distance_info, 1, alignment=Qt.AlignHCenter)
         layout.addLayout(row)
 
         row = QHBoxLayout()
         row.addWidget(QLabel('Current Height:'), 2, alignment=Qt.AlignRight)
-        self.current_height_info = QLabel('__m')
+        self.current_height_info = QLabel('__ m')
         row.addWidget(self.current_height_info, 1, alignment=Qt.AlignHCenter)
         layout.addLayout(row)
 
@@ -461,25 +461,25 @@ class CannonballDetails(SettingWindow):
 
         row = QHBoxLayout()
         row.addWidget(QLabel('Initial Total Velocity:'), 2, alignment=Qt.AlignRight)
-        self.initial_total_velocity_info = QLabel('__m/s<sup>-1</sup>')
+        self.initial_total_velocity_info = QLabel('__ m/s<sup>-1</sup>')
         row.addWidget(self.initial_total_velocity_info, 1, alignment=Qt.AlignHCenter)
         layout.addLayout(row)
 
         row = QHBoxLayout()
         row.addWidget(QLabel('Initial Moving Direction:'), 2, alignment=Qt.AlignRight)
-        self.initial_moving_direction_info = QLabel('__\u00B0')
+        self.initial_moving_direction_info = QLabel('__ \u00B0')
         row.addWidget(self.initial_moving_direction_info, 1, alignment=Qt.AlignHCenter)
         layout.addLayout(row)
 
         row = QHBoxLayout()
         row.addWidget(QLabel('Initial Horizontal Velocity:'), 2, alignment=Qt.AlignRight)
-        self.initial_horizontal_velocity_info = QLabel('__m/s<sup>-1</sup>')
+        self.initial_horizontal_velocity_info = QLabel('__ m/s<sup>-1</sup>')
         row.addWidget(self.initial_horizontal_velocity_info, 1, alignment=Qt.AlignHCenter)
         layout.addLayout(row)
 
         row = QHBoxLayout()
         row.addWidget(QLabel('Initial Vertical Velocity:'), 2, alignment=Qt.AlignRight)
-        self.initial_vertical_velocity_info = QLabel('__m/s<sup>-1</sup>')
+        self.initial_vertical_velocity_info = QLabel('__ m/s<sup>-1</sup>')
         row.addWidget(self.initial_vertical_velocity_info, 1, alignment=Qt.AlignHCenter)
         layout.addLayout(row)
 
@@ -487,25 +487,25 @@ class CannonballDetails(SettingWindow):
 
         row = QHBoxLayout()
         row.addWidget(QLabel('Current Total Velocity:'), 2, alignment=Qt.AlignRight)
-        self.current_total_velocity_info = QLabel('__m/s<sup>-1</sup>')
+        self.current_total_velocity_info = QLabel('__ m/s<sup>-1</sup>')
         row.addWidget(self.current_total_velocity_info, 1, alignment=Qt.AlignHCenter)
         layout.addLayout(row)
 
         row = QHBoxLayout()
         row.addWidget(QLabel('Current Moving Direction:'), 2, alignment=Qt.AlignRight)
-        self.current_moving_direction_info = QLabel('__\u00B0')
+        self.current_moving_direction_info = QLabel('__ \u00B0')
         row.addWidget(self.current_moving_direction_info, 1, alignment=Qt.AlignHCenter)
         layout.addLayout(row)
 
         row = QHBoxLayout()
         row.addWidget(QLabel('Current Horizontal Velocity:'), 2, alignment=Qt.AlignRight)
-        self.current_horizontal_velocity_info = QLabel('__m/s<sup>-1</sup>')
+        self.current_horizontal_velocity_info = QLabel('__ m/s<sup>-1</sup>')
         row.addWidget(self.current_horizontal_velocity_info, 1, alignment=Qt.AlignHCenter)
         layout.addLayout(row)
 
         row = QHBoxLayout()
         row.addWidget(QLabel('Current Vertical Velocity:'), 2, alignment=Qt.AlignRight)
-        self.current_vertical_velocity_info = QLabel('__m/s<sup>-1</sup>')
+        self.current_vertical_velocity_info = QLabel('__ m/s<sup>-1</sup>')
         row.addWidget(self.current_vertical_velocity_info, 1, alignment=Qt.AlignHCenter)
         layout.addLayout(row)
 
@@ -513,25 +513,25 @@ class CannonballDetails(SettingWindow):
 
         row = QHBoxLayout()
         row.addWidget(QLabel('Current Total Acceleration:'), 2, alignment=Qt.AlignRight)
-        self.current_total_acceleration_info = QLabel('__m/s<sup>-2</sup>')
+        self.current_total_acceleration_info = QLabel('__ m/s<sup>-2</sup>')
         row.addWidget(self.current_total_acceleration_info, 1, alignment=Qt.AlignHCenter)
         layout.addLayout(row)
 
         row = QHBoxLayout()
         row.addWidget(QLabel('Current Accelerating Direction:'), 2, alignment=Qt.AlignRight)
-        self.current_accelerating_direction_info = QLabel('__\u00B0')
+        self.current_accelerating_direction_info = QLabel('__ \u00B0')
         row.addWidget(self.current_accelerating_direction_info, 1, alignment=Qt.AlignHCenter)
         layout.addLayout(row)
 
         row = QHBoxLayout()
         row.addWidget(QLabel('Current Horizontal Acceleration:'), 2, alignment=Qt.AlignRight)
-        self.current_horizontal_acceleration_info = QLabel('__m/s<sup>-2</sup>')
+        self.current_horizontal_acceleration_info = QLabel('__ m/s<sup>-2</sup>')
         row.addWidget(self.current_horizontal_acceleration_info, 1, alignment=Qt.AlignHCenter)
         layout.addLayout(row)
 
         row = QHBoxLayout()
         row.addWidget(QLabel('Current Vertical Acceleration:'), 2, alignment=Qt.AlignRight)
-        self.current_vertical_acceleration_info = QLabel('__m/s<sup>-2</sup>')
+        self.current_vertical_acceleration_info = QLabel('__ m/s<sup>-2</sup>')
         row.addWidget(self.current_vertical_acceleration_info, 1, alignment=Qt.AlignHCenter)
         layout.addLayout(row)
 
@@ -539,43 +539,43 @@ class CannonballDetails(SettingWindow):
 
         row = QHBoxLayout()
         row.addWidget(QLabel('Initial Kinetic Energy:'), 2, alignment=Qt.AlignRight)
-        self.initial_kinetic_energy_info = QLabel('__J')
+        self.initial_kinetic_energy_info = QLabel('__ J')
         row.addWidget(self.initial_kinetic_energy_info, 1, alignment=Qt.AlignHCenter)
         layout.addLayout(row)
 
         row = QHBoxLayout()
         row.addWidget(QLabel('Initial Gravitational Potential Energy:'), 2, alignment=Qt.AlignRight)
-        self.initial_gravitational_potential_energy_info = QLabel('__J')
+        self.initial_gravitational_potential_energy_info = QLabel('__ J')
         row.addWidget(self.initial_gravitational_potential_energy_info, 1, alignment=Qt.AlignHCenter)
         layout.addLayout(row)
 
         row = QHBoxLayout()
         row.addWidget(QLabel('Initial Total Energy:'), 2, alignment=Qt.AlignRight)
-        self.initial_total_energy_info = QLabel('__J')
+        self.initial_total_energy_info = QLabel('__ J')
         row.addWidget(self.initial_total_energy_info, 1, alignment=Qt.AlignHCenter)
         layout.addLayout(row)
 
         row = QHBoxLayout()
         row.addWidget(QLabel('Current Kinetic Energy:'), 2, alignment=Qt.AlignRight)
-        self.current_kinetic_energy_info = QLabel('__J')
+        self.current_kinetic_energy_info = QLabel('__ J')
         row.addWidget(self.current_kinetic_energy_info, 1, alignment=Qt.AlignHCenter)
         layout.addLayout(row)
 
         row = QHBoxLayout()
         row.addWidget(QLabel('Current Gravitational Potential Energy:'), 2, alignment=Qt.AlignRight)
-        self.current_gravitational_potential_energy_info = QLabel('__J')
+        self.current_gravitational_potential_energy_info = QLabel('__ J')
         row.addWidget(self.current_gravitational_potential_energy_info, 1, alignment=Qt.AlignHCenter)
         layout.addLayout(row)
 
         row = QHBoxLayout()
         row.addWidget(QLabel('Current Total Energy:'), 2, alignment=Qt.AlignRight)
-        self.current_total_energy_info = QLabel('__J')
+        self.current_total_energy_info = QLabel('__ J')
         row.addWidget(self.current_total_energy_info, 1, alignment=Qt.AlignHCenter)
         layout.addLayout(row)
 
         row = QHBoxLayout()
         row.addWidget(QLabel('Energy Loss:'), 2, alignment=Qt.AlignRight)
-        self.energy_loss_info = QLabel('__J')
+        self.energy_loss_info = QLabel('__ J')
         row.addWidget(self.energy_loss_info, 1, alignment=Qt.AlignHCenter)
         layout.addLayout(row)
 
@@ -583,8 +583,8 @@ class CannonballDetails(SettingWindow):
 
     def update_information(self):
         cannonball = self.program.selecting_cannonball
-        if cannonball:
 
+        if cannonball:
             self.gravity_info.setText(f'{cannonball.gravity:.2f} m/s<sup>-2</sup>')
             self.air_resistance_enabled_info.setText('Yes' if cannonball.air_resistance_enabled else 'No')
             self.air_density_info.setText(f'{cannonball.air_density:.3f} kg/m<sup>-3<sup>' if cannonball.air_resistance_enabled else 'N/A')
@@ -620,3 +620,40 @@ class CannonballDetails(SettingWindow):
             self.current_gravitational_potential_energy_info.setText(f'{cannonball.current_gravitational_potential_energy:.0f} J')
             self.current_total_energy_info.setText(f'{cannonball.current_total_energy:.0f} J')
             self.energy_loss_info.setText(f'{cannonball.energy_loss:.0f} J')
+
+        else:
+            self.gravity_info.setText('__ m/s<sup>-2</sup>')
+            self.air_resistance_enabled_info.setText('N/A')
+            self.air_density_info.setText('__ kg/m<sup>-3<sup>')
+
+            self.mass_info.setText('__ kg')
+            self.radius_info.setText('__ m')
+            self.firing_time_info.setText('__ s')
+            self.time_after_firing_info.setText('__ s')
+
+            self.initial_height_info.setText('__ m')
+            self.current_distance_info.setText('__ m')
+            self.current_height_info.setText('__ m')
+
+            self.initial_total_velocity_info.setText('__ m/s<sup>-1</sup>')
+            self.initial_moving_direction_info.setText('__ \u00B0')
+            self.initial_horizontal_velocity_info.setText('__ m/s<sup>-1</sup>')
+            self.initial_vertical_velocity_info.setText('__ m/s<sup>-1</sup>')
+
+            self.current_total_velocity_info.setText('__ m/s<sup>-1</sup>')
+            self.current_moving_direction_info.setText('__ \u00B0')
+            self.current_horizontal_velocity_info.setText('__ m/s<sup>-1</sup>')
+            self.current_vertical_velocity_info.setText('__ m/s<sup>-1</sup>')
+
+            self.current_total_acceleration_info.setText('__ m/s<sup>-2</sup>')
+            self.current_accelerating_direction_info.setText('__ \u00B0')
+            self.current_horizontal_acceleration_info.setText('__ m/s<sup>-2</sup>')
+            self.current_vertical_acceleration_info.setText('__ m/s<sup>-2</sup>')
+
+            self.initial_kinetic_energy_info.setText('__ J')
+            self.initial_gravitational_potential_energy_info.setText('__ J')
+            self.initial_total_energy_info.setText('__ J')
+            self.current_kinetic_energy_info.setText('__ J')
+            self.current_gravitational_potential_energy_info.setText('__ J')
+            self.current_total_energy_info.setText('__ J')
+            self.energy_loss_info.setText('__ J')

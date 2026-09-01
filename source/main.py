@@ -130,9 +130,15 @@ class Program(QWidget):
         for cannonball in self.cannonballs:
             cannonball.update()
 
+    def deselect_cannonball(self):
+        if self.selecting_cannonball:
+            self.selecting_cannonball.deselect()
+            self.selecting_cannonball = None
+            self.setting_windows['Cannonball Details'].update_information()
+
     def change_selecting_cannonball(self, cannonball):
+        self.deselect_cannonball()
         cannonball.select()
-        if self.selecting_cannonball: self.selecting_cannonball.deselect()
         self.selecting_cannonball = cannonball
         self.setting_windows['Cannonball Details'].update_information()
 

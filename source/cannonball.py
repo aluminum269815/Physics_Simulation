@@ -202,7 +202,10 @@ class CannonBall(QLabel):
 
     def mousePressEvent(self, event, **kwargs):
         if event.button() == Qt.LeftButton:
-            self.program.change_selecting_cannonball(self)
+            if self is not self.program.selecting_cannonball:
+                self.program.change_selecting_cannonball(self)
+            else:
+                self.program.deselect_cannonball()
 
     def select(self):
         self.setPixmap(self.selecting_image)
