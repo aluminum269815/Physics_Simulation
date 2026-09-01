@@ -174,8 +174,8 @@ class CannonBall(QLabel):
 
         self.current_kinetic_energy = self.data_lists['ke'][self.time_index]
         self.current_gravitational_potential_energy = self.data_lists['gpe'][self.time_index]
-        self.current_total_energy = round(self.current_kinetic_energy + self.current_gravitational_potential_energy, 5)
-        self.energy_loss = round(self.initial_total_energy - self.current_total_energy, 0)
+        self.current_total_energy = round(self.current_kinetic_energy + self.current_gravitational_potential_energy, 2)
+        self.energy_loss = round(self.initial_total_energy - self.current_total_energy, 2)
 
     def update_position(self):
         x = WALL_WIDTH + CANNON_WIDTH + self.current_distance * PIXELS_PER_METRE - self.width() // 2

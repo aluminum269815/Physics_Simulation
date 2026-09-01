@@ -32,7 +32,7 @@ class CannonPlatform(QLabel):
     def mouseMoveEvent(self, event):
         if self.dragging:
             height_change = round((self.drag_y - event.globalY()) / PIXELS_PER_METRE, 1)
-            self.program.change_cannon_height(self.settings.cannon_height + height_change)
+            self.program.change_cannon_height(round(self.settings.cannon_height + height_change, 2))
             self.drag_y = event.globalY()
 
     def mouseReleaseEvent(self, event):
@@ -74,7 +74,7 @@ class CannonBase(QLabel):
     def mouseMoveEvent(self, event):
         if self.dragging:
             height_change = round((self.drag_y - event.globalY()) / PIXELS_PER_METRE, 1)
-            self.program.change_cannon_height(self.settings.cannon_height + height_change)
+            self.program.change_cannon_height(round(self.settings.cannon_height + height_change, 2))
             self.drag_y = event.globalY()
 
     def mouseReleaseEvent(self, event):

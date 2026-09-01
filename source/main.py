@@ -220,7 +220,7 @@ class Program(QWidget):
         background = self.background_image.scaled(WINDOW_WIDTH - WALL_WIDTH, WINDOW_HEIGHT - GROUND_HEIGHT, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
         painter.drawPixmap(0, 0, wall)
         painter.drawPixmap(WALL_WIDTH, 0, background)
-        painter.fillRect(WALL_WIDTH + CANNON_WIDTH + 10, GROUND_Y, WINDOW_WIDTH, GROUND_HEIGHT, QColor(*GROUND_COLOR))
+        painter.fillRect(WALL_WIDTH + CANNON_WIDTH + 50, GROUND_Y, WINDOW_WIDTH, GROUND_HEIGHT, QColor(*GROUND_COLOR))
 
         if self.settings.showing_trajectory:
             for cannonball in self.cannonballs:
