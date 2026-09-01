@@ -39,7 +39,7 @@ class Target(QLabel):
             self.settings.set_target_position(self.settings.target_distance + distance_change, self.settings.target_height + height_change)
             self.drag_position = event.globalPos()
             self.update_position()
-            self.program.target_position_label.update()
+            self.program.target_position_label.update_position()
 
     def mouseReleaseEvent(self, event, **kwargs):
         if event.button() == Qt.LeftButton:
@@ -65,9 +65,9 @@ class TargetLabel(QLabel):
             font-size: 11px;
         """)
 
-        self.update()
+        self.update_position()
 
-    def update(self):
+    def update_position(self):
         self.setText(f"{self.settings.target_distance:.2f} m, {self.settings.target_height:.2f} m")
         self.adjustSize()
         x = self.target.x() + (self.target.width() // 2) - (self.width() // 2)

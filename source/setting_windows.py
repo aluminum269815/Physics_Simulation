@@ -19,6 +19,9 @@ class SettingWindow(QWidget):
         flags &= ~Qt.WindowMinimizeButtonHint & ~Qt.WindowMaximizeButtonHint
         self.setWindowFlags(flags)
 
+    def update_information(self):
+        pass
+
 
 class BasicParameters(SettingWindow):
     name = 'Basic Parameters'
@@ -52,7 +55,7 @@ class BasicParameters(SettingWindow):
         gravity_label = QLabel('Gravity (downward acceleration)')
 
         self.gravity_slider = QSlider(Qt.Horizontal)
-        self.gravity_slider.setRange(0, int(MAX_SLIDER_GRAVITY * 100))
+        self.gravity_slider.setRange(int(MIN_GRAVITY * 100), int(MAX_SLIDER_GRAVITY * 100))
         self.gravity_slider.setValue(int(self.settings.gravity * 100))
         self.gravity_slider.sliderMoved.connect(self.change_slider_gravity)
 
@@ -124,6 +127,10 @@ class BasicParameters(SettingWindow):
     def update_gravity(self):
         self.gravity_slider.setValue(int(self.settings.gravity * 100))
         self.gravity_input.setText(str(self.settings.gravity))
+
+    def update_information(self):
+        self.update_air_density()
+        self.update_gravity()
 
 
 class VisualDisplay(SettingWindow):
@@ -369,6 +376,13 @@ class CannonSettings(SettingWindow):
     def update_firing_angle(self):
         self.firing_angle_slider.setValue(int(self.settings.firing_angle))
         self.firing_angle_input.setText(str(self.settings.firing_angle))
+
+    def update_information(self):
+        self.update_initial_velocity()
+        self.update_firing_angle()
+        self.update_cannon_height()
+        self.update_cannonball_mass()
+        self.update_cannonball_radius()
 
 
 class CannonballDetails(SettingWindow):

@@ -71,7 +71,9 @@ class CannonBall(QLabel):
         self.calculate_data_lists()
         self.max_time = round((len(self.data_lists['x']) - 1) * FRAME_INTERVAL, 3)
 
-        self.image = QPixmap()
+
+        self.default_image = None
+        self.selecting_image = None
         self.create_image()
         self.update()
 
@@ -128,10 +130,10 @@ class CannonBall(QLabel):
 
     def create_image(self):
         diameter = max(10, min(50, int(self.radius * CANNONBALL_SCALE)))
-        image = QPixmap(diameter, diameter)
-        image.fill(Qt.transparent)
+        self.default_image = QPixmap(diameter, diameter)
+        self.default_image.fill(Qt.transparent)
 
-        painter = QPainter(image)
+        painter = QPainter(self.default_image)
         painter.setRenderHint(QPainter.Antialiasing)
         gradient = QRadialGradient(diameter * 0.35, diameter * 0.35, diameter * 0.9)
         gradient.setColorAt(0, QColor(110, 110, 110))
@@ -141,8 +143,21 @@ class CannonBall(QLabel):
         painter.drawEllipse(0, 0, diameter, diameter)
         painter.end()
 
-        self.setPixmap(image)
-        self.setFixedSize(image.size())
+        self.selecting_image = QPixmap(diameter, diameter)
+        self.selecting_image.fill(Qt.transparent)
+
+        painter = QPainter(self.selecting_image)
+        painter.setRenderHint(QPainter.Antialiasing)
+        gradient = QRadialGradient(diameter * 0.35, diameter * 0.35, diameter * 0.9)
+        gradient.setColorAt(0, QColor(210, 210, 110))
+        gradient.setColorAt(1, QColor(125, 125, 25))
+        painter.setBrush(gradient)
+        painter.setPen(Qt.NoPen)
+        painter.drawEllipse(0, 0, diameter, diameter)
+        painter.end()
+
+        self.setPixmap(self.default_image)
+        self.setFixedSize(self.default_image.size())
 
     def update(self):
         self.update_time()
@@ -184,3 +199,13 @@ class CannonBall(QLabel):
         x = WALL_WIDTH + CANNON_WIDTH + self.current_distance * PIXELS_PER_METRE - self.width() // 2
         y = GROUND_Y - self.current_height * PIXELS_PER_METRE - self.height() // 2
         self.move(int(x), int(y))
+
+    def mousePressEvent(self, event, **kwargs):
+        if event.button() == Qt.LeftButton:
+            self.program.change_selecting_cannonball(self)
+
+    def select(self):
+        self.setPixmap(self.selecting_image)
+
+    def deselect(self):
+        self.setPixmap(self.default_image)

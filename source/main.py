@@ -123,7 +123,7 @@ class Program(QWidget):
         if not self.settings.paused and self.settings.time < self.settings.max_time:
             self.settings.time = round(self.settings.time + FRAME_INTERVAL, 3)
             self.update_cannonballs()
-            self.timeline.update()
+            self.timeline.update_value()
             self.setting_windows['Cannonball Details'].update_information()
 
     def update_cannonballs(self):
@@ -131,13 +131,15 @@ class Program(QWidget):
             cannonball.update()
 
     def change_selecting_cannonball(self, cannonball):
+        cannonball.select()
+        if self.selecting_cannonball: self.selecting_cannonball.deselect()
         self.selecting_cannonball = cannonball
         self.setting_windows['Cannonball Details'].update_information()
 
     def change_time(self, time):
         self.settings.set_time(time)
         self.update_cannonballs()
-        self.timeline.update()
+        self.timeline.update_value()
         self.setting_windows['Cannonball Details'].update_information()
 
     def change_cannon_height(self, height):
@@ -189,6 +191,18 @@ class Program(QWidget):
         self.update_max_time()
 
     def reset(self):
+        self.settings.reset()
+        self.timeline.update_value()
+        self.velocity_slider.update_value()
+        self.cannon_platform.update_position()
+        self.cannon_base.update_position()
+        self.cannon_barrel.update_position()
+        self.cannon_barrel.update_angle()
+        for setting_window in self.setting_windows.values():
+            setting_window.update_information()
+        self.clear()
+
+    def clear(self):
         for cannon in self.cannonballs:
             cannon.deleteLater()
         self.cannonballs.clear()
@@ -200,7 +214,7 @@ class Program(QWidget):
             self.settings.set_max_time(max([cannonball.firing_time + cannonball.max_time for cannonball in self.cannonballs]))
         else:
             self.settings.set_max_time(0)
-        self.timeline.update()
+        self.timeline.update_value()
 
     def switch_paused(self):
         if self.settings.paused:
@@ -223,6 +237,7 @@ class Program(QWidget):
         background = self.background_image.scaled(WINDOW_WIDTH - WALL_WIDTH, WINDOW_HEIGHT - GROUND_HEIGHT, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
         painter.drawPixmap(0, 0, wall)
         painter.drawPixmap(WALL_WIDTH, 0, background)
+        painter.fillRect(WALL_WIDTH, GROUND_Y, CANNON_WIDTH + 50, GROUND_HEIGHT, QColor(*VERTICAL_SHAFT_COLOR))
         painter.fillRect(WALL_WIDTH + CANNON_WIDTH + 50, GROUND_Y, WINDOW_WIDTH, GROUND_HEIGHT, QColor(*GROUND_COLOR))
 
         for cannonball in self.cannonballs:
@@ -278,14 +293,14 @@ class Program(QWidget):
                                     - (vertical_acceleration_arrow.height() if cannonball.current_vertical_acceleration > 0 else 0)),
                                    vertical_acceleration_arrow)
 
-                total_acceleration_arrow = self.acceleration_arrow.scaled(int(80 * abs(cannonball.current_total_acceleration) / ACCELERATION_ARROW_SCALE), 11)
-                transform = QTransform()
-                transform.rotate(int(-cannonball.current_accelerating_direction))
-                total_acceleration_arrow = total_acceleration_arrow.transformed(transform, Qt.SmoothTransformation)
-                painter.drawPixmap(int(cannonball.x() + cannonball.width() / 2 - total_acceleration_arrow.width()),
-                                   int(cannonball.y() + cannonball.height() / 2),
-                                   total_acceleration_arrow)
-
+                if cannonball.air_resistance_enabled:
+                    total_acceleration_arrow = self.acceleration_arrow.scaled(int(80 * abs(cannonball.current_total_acceleration) / ACCELERATION_ARROW_SCALE), 11)
+                    transform = QTransform()
+                    transform.rotate(int(-cannonball.current_accelerating_direction))
+                    total_acceleration_arrow = total_acceleration_arrow.transformed(transform, Qt.SmoothTransformation)
+                    painter.drawPixmap(int(cannonball.x() + cannonball.width() / 2 - total_acceleration_arrow.width()),
+                                       int(cannonball.y() + cannonball.height() / 2),
+                                       total_acceleration_arrow)
 
 
         painter.end()

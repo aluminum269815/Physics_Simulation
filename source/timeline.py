@@ -16,7 +16,7 @@ class Timeline(QSlider):
 
         self.sliderMoved.connect(self.change_time)
 
-    def update(self):
+    def update_value(self):
         self.setValue(int(self.settings.time // FRAME_INTERVAL))
         self.setMaximum(int(self.settings.max_time // FRAME_INTERVAL))
         self.setEnabled(self.settings.max_time > 0)

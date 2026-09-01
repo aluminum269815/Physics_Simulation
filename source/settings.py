@@ -31,8 +31,21 @@ class Settings:
         self.showing_velocity_arrows = False
         self.showing_acceleration_arrows = False
 
+    def reset(self):
+        self.gravity = DEFAULT_GRAVITY
+        self.air_resistance_enabled = True
+        self.air_density = DEFAULT_AIR_DENSITY
+        self.drag_coefficient = DEFAULT_DRAG_COEFFICIENT
+
+        self.cannon_height = DEFAULT_CANNON_HEIGHT
+        self.firing_angle = DEFAULT_FIRING_ANGLE
+        self.initial_velocity = DEFAULT_CANNON_INITIAL_VELOCITY
+
+        self.cannonball_mass = DEFAULT_CANNONBALL_MASS
+        self.cannonball_radius = DEFAULT_CANNONBALL_RADIUS
+
     def set_gravity(self, gravity):
-        self.gravity = min(max(gravity, 0), MAX_GRAVITY)
+        self.gravity = min(max(gravity, MIN_GRAVITY), MAX_GRAVITY)
 
     def set_air_resistance_enabled(self, enabled):
         self.air_resistance_enabled = enabled
