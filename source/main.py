@@ -1,6 +1,6 @@
 import sys
 from PyQt5.QtWidgets import QWidget, QPushButton, QFrame, QVBoxLayout, QApplication
-from PyQt5.QtGui import QPainter, QColor, QPolygon, QPen, QTransform
+from PyQt5.QtGui import QPainter, QColor, QPolygon, QPen, QBrush, QTransform, QLinearGradient
 from PyQt5.QtCore import Qt, QTimer, QPoint
 
 from settings import Settings
@@ -48,19 +48,19 @@ class Program(QWidget):
         self.target_position_label = TargetLabel(self)
 
         self.fire_button = FireButton(self)
-        self.fire_button.move(FIRE_BUTTON_X, GROUND_Y + BUTTON_DEPTH)
+        self.fire_button.move(FIRE_BUTTON_X, GROUND_Y)
         self.fire_button.clicked.connect(self.fire_cannon)
 
         self.pause_button = PauseButton(self)
-        self.pause_button.move(PAUSE_BUTTON_X, GROUND_Y + BUTTON_DEPTH)
+        self.pause_button.move(PAUSE_BUTTON_X, BUTTON_Y)
         self.pause_button.clicked.connect(self.switch_paused)
 
         self.reset_button = ResetButton(self)
-        self.reset_button.move(RESET_BUTTON_X, GROUND_Y + BUTTON_DEPTH)
+        self.reset_button.move(RESET_BUTTON_X, BUTTON_Y)
         self.reset_button.clicked.connect(self.reset)
 
         self.timeline = Timeline(self)
-        self.timeline.move(900, GROUND_Y + BUTTON_DEPTH)
+        self.timeline.move(TIMELINE_X, BUTTON_Y)
 
         self.velocity_slider = VelocitySlider(self)
         self.velocity_slider.move(50, 200)
@@ -197,6 +197,7 @@ class Program(QWidget):
         self.update_max_time()
 
     def reset(self):
+        self.clear()
         self.settings.reset()
         self.timeline.update_value()
         self.velocity_slider.update_value()
@@ -206,7 +207,6 @@ class Program(QWidget):
         self.cannon_barrel.update_angle()
         for setting_window in self.setting_windows.values():
             setting_window.update_information()
-        self.clear()
 
     def clear(self):
         for cannon in self.cannonballs:
@@ -243,8 +243,19 @@ class Program(QWidget):
         background = self.background_image.scaled(WINDOW_WIDTH - WALL_WIDTH, WINDOW_HEIGHT - GROUND_HEIGHT, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
         painter.drawPixmap(0, 0, wall)
         painter.drawPixmap(WALL_WIDTH, 0, background)
-        painter.fillRect(WALL_WIDTH, GROUND_Y, CANNON_WIDTH + 50, GROUND_HEIGHT, QColor(*VERTICAL_SHAFT_COLOR))
-        painter.fillRect(WALL_WIDTH + CANNON_WIDTH + 50, GROUND_Y, WINDOW_WIDTH, GROUND_HEIGHT, QColor(*GROUND_COLOR))
+
+        vertical_shaft_gradient = QLinearGradient(WALL_WIDTH, GROUND_Y, WALL_WIDTH + CANNON_WIDTH + 50, GROUND_Y)
+        vertical_shaft_gradient.setColorAt(0.0, QColor(*VERTICAL_SHAFT_EDGE_COLOR))
+        vertical_shaft_gradient.setColorAt(0.5, QColor(*VERTICAL_SHAFT_MIDDLE_COLOR))
+        vertical_shaft_gradient.setColorAt(1.0, QColor(*VERTICAL_SHAFT_EDGE_COLOR))
+        vertical_shaft_brush = QBrush(vertical_shaft_gradient)
+        painter.fillRect(WALL_WIDTH, GROUND_Y, CANNON_WIDTH + 50, GROUND_HEIGHT, vertical_shaft_brush)
+
+        ground_gradient = QLinearGradient(0, GROUND_Y, 0, WINDOW_HEIGHT)
+        ground_gradient.setColorAt(0.0, QColor(*GROUND_TOP_COLOR))
+        ground_gradient.setColorAt(1.0, QColor(*GROUND_BOTTOM_COLOR))
+        ground_brush = QBrush(ground_gradient)
+        painter.fillRect(WALL_WIDTH + CANNON_WIDTH + 50, GROUND_Y, WINDOW_WIDTH, GROUND_HEIGHT, ground_brush)
 
         for cannonball in self.cannonballs:
             if self.settings.showing_trajectory:
@@ -307,7 +318,6 @@ class Program(QWidget):
                     painter.drawPixmap(int(cannonball.x() + cannonball.width() / 2 - total_acceleration_arrow.width()),
                                        int(cannonball.y() + cannonball.height() / 2),
                                        total_acceleration_arrow)
-
 
         painter.end()
 

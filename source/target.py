@@ -47,7 +47,7 @@ class Target(QLabel):
             self.setCursor(Qt.OpenHandCursor)
 
     def update_position(self):
-        x = WALL_WIDTH + self.settings.target_distance * PIXELS_PER_METRE - self.width() // 2
+        x = WALL_WIDTH + CANNON_WIDTH + self.settings.target_distance * PIXELS_PER_METRE - self.width() // 2
         y = self.program.height() - GROUND_HEIGHT - self.settings.target_height * PIXELS_PER_METRE - self.height() // 2
         self.move(int(x), int(y))
 

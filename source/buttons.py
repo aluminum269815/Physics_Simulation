@@ -22,7 +22,7 @@ class Button(QPushButton):
 
         self.setIcon(QIcon(self.image))
         self.setIconSize(self.image.size())
-        self.setFixedSize(self.image.width() + 6, self.image.height() + 6)
+        self.setFixedSize(self.image.size())
         self.setCursor(Qt.PointingHandCursor)
         self.setStyleSheet("""
             QPushButton {
@@ -71,8 +71,8 @@ class FireButton(Button):
     
 
 class PauseButton(Button):
-    image_paths = {'playing': 'pause_button_paused.png',
-                   'paused': 'pause_button_playing.png'}
+    image_paths = {'playing': 'pause_button_playing.png',
+                   'paused': 'pause_button_paused.png'}
     initial_image = 'playing'
     size = PAUSE_BUTTON_SIZE
 
