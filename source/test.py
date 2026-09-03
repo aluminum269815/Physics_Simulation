@@ -1,5 +1,5 @@
-from main import Program
 from cannonball import CannonBall
+from main import Program
 
 test_program = Program()
 test_cannonball = CannonBall(test_program)

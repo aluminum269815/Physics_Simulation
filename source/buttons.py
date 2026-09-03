@@ -9,14 +9,13 @@ from functions import load_image
 class Button(QPushButton):
     image_paths = {'default': None}
     initial_image = 'default'
-    size = (100, 100)
 
     def __init__(self, program):
         super().__init__(program)
         
         self.images = {}
         for name, path in self.image_paths.items():
-            self.images[name] = load_image(path).scaled(*self.size)
+            self.images[name] = load_image(path)
         self.image = self.images[self.initial_image]
         self.hovering = False
 
@@ -43,7 +42,7 @@ class Button(QPushButton):
         painter.end()
         return darkened_image
 
-    def update_image(self):
+    def update_hovering(self):
         if self.hovering:
             darkened_image = self.get_darkened_image()
             self.setIcon(QIcon(darkened_image))
@@ -52,30 +51,41 @@ class Button(QPushButton):
 
     def set_image(self, image_name):
         self.image = self.images[image_name]
-        self.update_image()
+        self.update_hovering()
 
     def enterEvent(self, event):
         self.hovering = True
-        self.update_image()
+        self.update_hovering()
         super().enterEvent(event)
 
     def leaveEvent(self, event):
         self.hovering = False
-        self.update_image()
+        self.update_hovering()
         super().leaveEvent(event)
 
 
 class FireButton(Button):
     image_paths = {'default': 'fire_button.png'}
-    size = FIRE_BUTTON_SIZE
-    
+
+class ResetButton(Button):
+    image_paths = {'default': 'reset_button.png'}
+
+class SpeedButton(Button):
+    image_paths = {'normal': 'speed_button_normal.png',
+                   'double': 'speed_button_double.png',
+                   'half': 'speed_button_half.png'}
+    initial_image = 'normal'
 
 class PauseButton(Button):
     image_paths = {'playing': 'pause_button_playing.png',
                    'paused': 'pause_button_paused.png'}
     initial_image = 'playing'
-    size = PAUSE_BUTTON_SIZE
 
-class ResetButton(Button):
-    image_paths = {'default': 'reset_button.png'}
-    size = RESET_BUTTON_SIZE
+class DeleteButton(Button):
+    image_paths = {'default': 'delete_button.png'}
+
+class SelectPreviousButton(Button):
+    image_paths = {'default': 'select_previous_button.png'}
+
+class SelectNextButton(Button):
+    image_paths = {'default': 'select_next_button.png'}

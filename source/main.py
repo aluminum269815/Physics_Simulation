@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QWidget, QPushButton, QFrame, QVBoxLayout, QApplication
+from PyQt5.QtWidgets import QWidget, QPushButton, QFrame, QVBoxLayout, QGridLayout, QApplication
 from PyQt5.QtGui import QPainter, QColor, QPolygon, QPen, QBrush, QTransform, QLinearGradient
 from PyQt5.QtCore import Qt, QTimer, QPoint
 
@@ -10,7 +10,7 @@ from target import Target, TargetLabel
 from setting_windows import BasicParameters, VisualDisplay, CannonSettings, CannonballDetails
 from cannon import CannonPlatform, CannonBase, CannonBarrel
 from cannonball import CannonBall
-from buttons import FireButton, PauseButton, ResetButton
+from buttons import FireButton, ResetButton, SpeedButton, PauseButton, DeleteButton, SelectPreviousButton, SelectNextButton
 from timeline import Timeline
 from velocity_slider import VelocitySlider
 
@@ -18,7 +18,7 @@ from velocity_slider import VelocitySlider
 class Program(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Projectile Motion sim")
+        self.setWindowTitle("Projectile Motion Simulation")
         self.background_image = load_image('background.png')
         self.wall_image = load_image('wall.png')
         self.velocity_arrow = load_image('velocity_arrow.png')
@@ -51,16 +51,46 @@ class Program(QWidget):
         self.fire_button.move(FIRE_BUTTON_X, GROUND_Y)
         self.fire_button.clicked.connect(self.fire_cannon)
 
-        self.pause_button = PauseButton(self)
-        self.pause_button.move(PAUSE_BUTTON_X, BUTTON_Y)
-        self.pause_button.clicked.connect(self.switch_paused)
+        self.controlling_frame = QFrame(self)
+        self.controlling_frame.move(CONTROLLING_FRAME_X, CONTROLLING_FRAME_Y)
+
+        controlling_layout = QGridLayout()
+        controlling_layout.setContentsMargins(75, 30, 0, 0)
+        controlling_layout.setHorizontalSpacing(40)
+        controlling_layout.setVerticalSpacing(40)
 
         self.reset_button = ResetButton(self)
-        self.reset_button.move(RESET_BUTTON_X, BUTTON_Y)
         self.reset_button.clicked.connect(self.reset)
+        controlling_layout.addWidget(self.reset_button, 0, 0)
+
+        self.speed_button = SpeedButton(self)
+        self.speed_button.clicked.connect(self.switch_playing_speed)
+        controlling_layout.addWidget(self.speed_button, 0, 1)
+
+        self.pause_button = PauseButton(self)
+        self.pause_button.clicked.connect(self.switch_paused)
+        controlling_layout.addWidget(self.pause_button, 0, 2)
 
         self.timeline = Timeline(self)
-        self.timeline.move(TIMELINE_X, BUTTON_Y)
+        controlling_layout.addWidget(self.timeline, 0, 3)
+
+        self.delete_button = DeleteButton(self)
+        self.delete_button.clicked.connect(self.delete_cannonball)
+        self.delete_button.setEnabled(False)
+        controlling_layout.addWidget(self.delete_button, 1, 0)
+
+        self.select_previous_button = SelectPreviousButton(self)
+        self.select_previous_button.clicked.connect(lambda: self.select_offset_cannonball(-1))
+        self.select_previous_button.setEnabled(False)
+        controlling_layout.addWidget(self.select_previous_button, 1, 1)
+
+        self.select_next_button = SelectNextButton(self)
+        self.select_next_button.clicked.connect(lambda: self.select_offset_cannonball(1))
+        self.select_next_button.setEnabled(False)
+        controlling_layout.addWidget(self.select_next_button, 1, 2)
+
+        self.controlling_frame.setLayout(controlling_layout)
+
 
         self.velocity_slider = VelocitySlider(self)
         self.velocity_slider.move(50, 200)
@@ -68,38 +98,34 @@ class Program(QWidget):
         self.cannonballs = []
         self.selecting_cannonball = None
 
-        self.settings_panel = QPushButton("   Settings    ▼")
-        self.settings_panel.clicked.connect(self.toggle_settings)
-        self.settings_panel.setFixedSize(150, 40)
-
-        self.settings_menu = QFrame()
+        self.settings_menu = QFrame(self)
         self.settings_menu.setStyleSheet("""
-            QFrame {
-                background-color: #c2c1c2;
-                border: 1px solid #cccccc;
-                border-radius: 8px;
-            }
+                    QFrame {
+                        background-color: #c2c1c2;
+                        border: 1px solid #cccccc;
+                        border-radius: 8px;
+                    }
 
-            QPushButton {
-                background-color: #c2c1c2;
-                color: black;
-                border: grey;
-                padding: 8px;
-                text-align: left;
-                border-radius: 4px;
-                font-family: Arial;
-            }
+                    QPushButton {
+                        background-color: #c2c1c2;
+                        color: black;
+                        border: grey;
+                        padding: 8px;
+                        text-align: left;
+                        border-radius: 4px;
+                        font-family: Arial;
+                    }
 
-            QPushButton:hover {
-                background-color: #eeeeee;
-                font-family: Arial;
-                font-weight: bold;
-            }
-        """)
+                    QPushButton:hover {
+                        background-color: #eeeeee;
+                        font-family: Arial;
+                        font-weight: bold;
+                    }
+                """)
 
         settings_layout = QVBoxLayout()
         settings_layout.setContentsMargins(8, 8, 8, 8)
-        settings_layout.setSpacing(4)
+        settings_layout.setSpacing(5)
 
         for name in ('Basic Parameters', 'Visual Display', 'Cannon Settings', 'Cannonball Details'):
             button = QPushButton(name)
@@ -107,21 +133,11 @@ class Program(QWidget):
             settings_layout.addWidget(button)
 
         self.settings_menu.setLayout(settings_layout)
-        self.settings_menu.setVisible(False)
-
-        settings_container_layout = QVBoxLayout()
-        settings_container_layout.setContentsMargins(0, 15, 20, 0)
-        settings_container_layout.setSpacing(5)
-        settings_container_layout.setAlignment(Qt.AlignTop | Qt.AlignRight)
-
-        settings_container_layout.addWidget(self.settings_panel)
-        settings_container_layout.addWidget(self.settings_menu)
-
-        self.setLayout(settings_container_layout)
+        self.settings_menu.move(WINDOW_WIDTH - self.settings_menu.width() - 150, 50)
 
     def update_frame(self):
         if not self.settings.paused and self.settings.time < self.settings.max_time:
-            self.settings.time = round(self.settings.time + FRAME_INTERVAL, 3)
+            self.settings.time = round(self.settings.time + FRAME_INTERVAL * self.settings.playing_speed, 4)
             self.update_cannonballs()
             self.timeline.update_value()
             self.setting_windows['Cannonball Details'].update_information()
@@ -134,12 +150,14 @@ class Program(QWidget):
         if self.selecting_cannonball:
             self.selecting_cannonball.deselect()
             self.selecting_cannonball = None
+            self.delete_button.setEnabled(False)
             self.setting_windows['Cannonball Details'].update_information()
 
     def change_selecting_cannonball(self, cannonball):
         self.deselect_cannonball()
         cannonball.select()
         self.selecting_cannonball = cannonball
+        self.delete_button.setEnabled(True)
         self.setting_windows['Cannonball Details'].update_information()
 
     def change_time(self, time):
@@ -174,15 +192,6 @@ class Program(QWidget):
         self.velocity_slider.update_value()
         self.setting_windows['Cannon Settings'].update_initial_velocity()
 
-    def toggle_settings(self):
-        is_visible = self.settings_menu.isVisible()
-        self.settings_menu.setVisible(not is_visible)
-
-        if is_visible:
-            self.settings_panel.setText("   Settings    ▶")
-        else:
-            self.settings_panel.setText("   Settings    ▼")
-
     def show_window(self, name):
         if self.setting_windows[name].isVisible():
             self.setting_windows[name].raise_()
@@ -195,6 +204,9 @@ class Program(QWidget):
         self.cannonballs.append(cannonball)
         self.change_selecting_cannonball(cannonball)
         self.update_max_time()
+        if len(self.cannonballs) >= 2:
+            self.select_next_button.setEnabled(True)
+            self.select_previous_button.setEnabled(True)
 
     def reset(self):
         self.clear()
@@ -209,11 +221,21 @@ class Program(QWidget):
             setting_window.update_information()
 
     def clear(self):
-        for cannon in self.cannonballs:
-            cannon.deleteLater()
+        self.deselect_cannonball()
+        for cannonball in self.cannonballs:
+            cannonball.deleteLater()
         self.cannonballs.clear()
-        self.selecting_cannonball = None
         self.update_max_time()
+        self.select_previous_button.setEnabled(False)
+        self.select_next_button.setEnabled(False)
+
+    def update_min_time(self):
+        if len(self.cannonballs) > 0:
+            min_time = min([cannonball.firing_time for cannonball in self.cannonballs])
+            if min_time > 0:
+                for cannonball in self.cannonballs:
+                    cannonball.firing_time = round(cannonball.firing_time - min_time, 3)
+                self.settings.set_time(round(self.settings.time - min_time, 3))
 
     def update_max_time(self):
         if len(self.cannonballs) > 0:
@@ -221,6 +243,18 @@ class Program(QWidget):
         else:
             self.settings.set_max_time(0)
         self.timeline.update_value()
+
+    def switch_playing_speed(self):
+        match self.settings.playing_speed:
+            case 1.0:
+                self.settings.playing_speed = 2.0
+                self.speed_button.set_image('double')
+            case 2.0:
+                self.settings.playing_speed = 0.5
+                self.speed_button.set_image('half')
+            case 0.5:
+                self.settings.playing_speed = 1.0
+                self.speed_button.set_image('normal')
 
     def switch_paused(self):
         if self.settings.paused:
@@ -235,6 +269,27 @@ class Program(QWidget):
     def pause(self):
         self.settings.paused = True
         self.pause_button.set_image('paused')
+
+    def delete_cannonball(self):
+        deleting_cannonball = self.selecting_cannonball
+        self.deselect_cannonball()
+        self.cannonballs.remove(deleting_cannonball)
+        deleting_cannonball.deleteLater()
+        self.update_min_time()
+        self.update_max_time()
+        self.setting_windows['Cannonball Details'].update_information()
+        if len(self.cannonballs) < 2:
+            self.select_next_button.setEnabled(False)
+            self.select_previous_button.setEnabled(False)
+
+    def select_offset_cannonball(self, offset):
+        if self.selecting_cannonball:
+            index = self.cannonballs.index(self.selecting_cannonball)
+        else:
+            index = 0
+
+        index = (index + offset) % len(self.cannonballs)
+        self.change_selecting_cannonball(self.cannonballs[index])
 
     def paintEvent(self, event, **kwargs):
         self.update()

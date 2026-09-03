@@ -22,7 +22,7 @@ class Settings:
         self.time = 0
         self.max_time = 0
         self.paused = False
-        self.displaying_speed = 1
+        self.playing_speed = 1.0
 
         self.all_cannonball_selected = False
         self.selecting_cannonball = None
