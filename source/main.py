@@ -54,7 +54,6 @@ class Program(QWidget):
 
         self.controlling_frame = QFrame(self)
         self.controlling_frame.move(CONTROLLING_FRAME_X, CONTROLLING_FRAME_Y)
-        #self.controlling_frame.setFixedSize(WINDOW_WIDTH - CONTROLLING_FRAME_X, WINDOW_HEIGHT - CONTROLLING_FRAME_Y)
 
         controlling_layout = QGridLayout()
         controlling_layout.setContentsMargins(75, 30, 0, 0)
@@ -108,7 +107,7 @@ class Program(QWidget):
 
 
         self.velocity_slider = VelocitySlider(self)
-        self.velocity_slider.move(50, 200)
+        self.velocity_slider.move(40, 150)
 
         self.cannonballs = []
         self.selecting_cannonball = None

@@ -10,7 +10,30 @@ class VelocitySlider(QSlider):
         self.program = program
         self.settings = program.settings
 
-        self.setFixedSize(100, 600)
+        self.setFixedSize(95, 830)
+        self.setStyleSheet('''
+
+                QSlider::groove:vertical {
+                    width: 95px;
+                    border: none;
+                    background-image: url("D:/Construction/Projects/Physics_Simulation/assets/velocity_slider_lower.png");
+                }
+                
+                QSlider::sub-page:vertical {
+                    width: 95px;
+                    border: none;
+                    background: url("D:/Construction/Projects/Physics_Simulation/assets/velocity_slider_upper.png");
+                }
+                
+                QSlider::handle:vertical {
+                    width: 95px;
+                    height: 30px;
+                    border: black;
+                    border-style: solid;
+                    border-width: 2px;
+                    background: deepskyblue;
+                }
+                ''')
         self.setRange(MIN_INITIAL_VELOCITY * 10, MAX_SLIDER_INITIAL_VELOCITY * 10)
         self.setValue(int(self.settings.initial_velocity * 10))
 

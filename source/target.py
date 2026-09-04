@@ -58,17 +58,18 @@ class TargetLabel(QLabel):
         self.settings = parent.settings
         self.target = parent.target
         self.setStyleSheet("""
-            background-color: rgba(255, 255, 255, 190);
+            background-color: rgba(255, 255, 255, 180);
             padding: 2px 6px;
-            border-radius: 4px;
+            border-radius: 3px;
             font-family: Arial;
-            font-size: 11px;
+            font-weight: bold;
+            font-size: 13px;
         """)
 
         self.update_position()
 
     def update_position(self):
-        self.setText(f"{self.settings.target_distance:.2f} m, {self.settings.target_height:.2f} m")
+        self.setText(f"X: {self.settings.target_distance:.2f} m, Y: {self.settings.target_height:.2f} m")
         self.adjustSize()
         x = self.target.x() + (self.target.width() // 2) - (self.width() // 2)
         y = self.target.y() + self.target.height() + 4
