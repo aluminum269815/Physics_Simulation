@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QWidget, QPushButton, QFrame, QVBoxLayout, QGridLayout, QApplication
+from PyQt5.QtWidgets import QWidget, QPushButton, QFrame, QVBoxLayout, QGridLayout, QApplication, QLabel, QLineEdit
 from PyQt5.QtGui import QPainter, QColor, QPolygon, QPen, QBrush, QTransform, QLinearGradient
 from PyQt5.QtCore import Qt, QTimer, QPoint
 
@@ -12,6 +12,7 @@ from cannon import CannonPlatform, CannonBase, CannonBarrel
 from cannonball import CannonBall
 from buttons import FireButton, ResetButton, SpeedButton, PauseButton, DeleteButton, SelectPreviousButton, SelectNextButton
 from timeline import Timeline
+from time_input import TimeInput
 from velocity_slider import VelocitySlider
 
 
@@ -53,6 +54,7 @@ class Program(QWidget):
 
         self.controlling_frame = QFrame(self)
         self.controlling_frame.move(CONTROLLING_FRAME_X, CONTROLLING_FRAME_Y)
+        #self.controlling_frame.setFixedSize(WINDOW_WIDTH - CONTROLLING_FRAME_X, WINDOW_HEIGHT - CONTROLLING_FRAME_Y)
 
         controlling_layout = QGridLayout()
         controlling_layout.setContentsMargins(75, 30, 0, 0)
@@ -72,7 +74,11 @@ class Program(QWidget):
         controlling_layout.addWidget(self.pause_button, 0, 2)
 
         self.timeline = Timeline(self)
-        controlling_layout.addWidget(self.timeline, 0, 3)
+        controlling_layout.addWidget(self.timeline, 0, 3, Qt.AlignHCenter)
+        controlling_layout.setColumnMinimumWidth(3, 1000)
+
+        self.time_input = TimeInput(self)
+        controlling_layout.addWidget(self.time_input, 0, 4)
 
         self.delete_button = DeleteButton(self)
         self.delete_button.clicked.connect(self.delete_cannonball)
@@ -88,6 +94,15 @@ class Program(QWidget):
         self.select_next_button.clicked.connect(lambda: self.select_offset_cannonball(1))
         self.select_next_button.setEnabled(False)
         controlling_layout.addWidget(self.select_next_button, 1, 2)
+
+        self.selection_label = QLabel(self)
+        self.selection_label.setText('There is no cannonball.')
+        self.selection_label.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        self.selection_label.setFixedSize(600, 80)
+        self.selection_label.setStyleSheet('font-size: 30px;'
+                                           'background-color: white;'
+                                           'align-items: center')
+        controlling_layout.addWidget(self.selection_label, 1, 3, Qt.AlignHCenter | Qt.AlignVCenter)
 
         self.controlling_frame.setLayout(controlling_layout)
 
@@ -140,6 +155,7 @@ class Program(QWidget):
             self.settings.time = round(self.settings.time + FRAME_INTERVAL * self.settings.playing_speed, 4)
             self.update_cannonballs()
             self.timeline.update_value()
+            self.time_input.update_value()
             self.setting_windows['Cannonball Details'].update_information()
 
     def update_cannonballs(self):
@@ -152,6 +168,7 @@ class Program(QWidget):
             self.selecting_cannonball = None
             self.delete_button.setEnabled(False)
             self.setting_windows['Cannonball Details'].update_information()
+            self.selection_label.setText(f'{len(self.cannonballs)} cannonball(s) in total.' if len(self.cannonballs) > 0 else 'There is no cannonball.')
 
     def change_selecting_cannonball(self, cannonball):
         self.deselect_cannonball()
@@ -159,11 +176,13 @@ class Program(QWidget):
         self.selecting_cannonball = cannonball
         self.delete_button.setEnabled(True)
         self.setting_windows['Cannonball Details'].update_information()
+        self.selection_label.setText(f'Selected {self.cannonballs.index(self.selecting_cannonball) + 1} of {len(self.cannonballs)} cannonball(s).')
 
     def change_time(self, time):
         self.settings.set_time(time)
         self.update_cannonballs()
         self.timeline.update_value()
+        self.time_input.update_value()
         self.setting_windows['Cannonball Details'].update_information()
 
     def change_cannon_height(self, height):
@@ -212,6 +231,7 @@ class Program(QWidget):
         self.clear()
         self.settings.reset()
         self.timeline.update_value()
+        self.time_input.update_value()
         self.velocity_slider.update_value()
         self.cannon_platform.update_position()
         self.cannon_base.update_position()
@@ -228,6 +248,7 @@ class Program(QWidget):
         self.update_max_time()
         self.select_previous_button.setEnabled(False)
         self.select_next_button.setEnabled(False)
+        self.selection_label.setText('There is no cannonball.')
 
     def update_min_time(self):
         if len(self.cannonballs) > 0:
@@ -243,6 +264,7 @@ class Program(QWidget):
         else:
             self.settings.set_max_time(0)
         self.timeline.update_value()
+        self.time_input.update_value()
 
     def switch_playing_speed(self):
         match self.settings.playing_speed:
@@ -272,12 +294,14 @@ class Program(QWidget):
 
     def delete_cannonball(self):
         deleting_cannonball = self.selecting_cannonball
-        self.deselect_cannonball()
         self.cannonballs.remove(deleting_cannonball)
+        self.deselect_cannonball()
         deleting_cannonball.deleteLater()
         self.update_min_time()
         self.update_max_time()
         self.setting_windows['Cannonball Details'].update_information()
+        if len(self.cannonballs) > 0:
+            self.select_offset_cannonball(-1)
         if len(self.cannonballs) < 2:
             self.select_next_button.setEnabled(False)
             self.select_previous_button.setEnabled(False)

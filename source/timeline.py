@@ -10,7 +10,7 @@ class Timeline(QSlider):
         self.program = program
         self.settings = program.settings
 
-        self.setFixedSize(1000, 100)
+        self.setFixedSize(900, 100)
         self.setRange(0, 0)
         self.setEnabled(False)
 
