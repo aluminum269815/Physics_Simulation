@@ -338,7 +338,7 @@ class CannonSettings(SettingWindow):
 
     def change_input_cannon_height(self):
         try:
-            height = round(float(self.cannonball_height_input.text()), 1)
+            height = round(float(self.cannon_height_input.text()), 1)
             self.program.change_cannon_height(height)
         except ValueError:
             self.update_cannon_height()

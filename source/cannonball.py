@@ -197,7 +197,7 @@ class CannonBall(QLabel):
 
     def update_position(self):
         x = WALL_WIDTH + CANNON_WIDTH + self.current_distance * PIXELS_PER_METRE - self.width() // 2
-        y = GROUND_Y - self.current_height * PIXELS_PER_METRE - self.height() // 2
+        y = self.program.height() - GROUND_HEIGHT - self.current_height * PIXELS_PER_METRE - self.height() // 2
         self.move(int(x), int(y))
 
     def mousePressEvent(self, event, **kwargs):

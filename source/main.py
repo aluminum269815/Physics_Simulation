@@ -17,15 +17,17 @@ from velocity_slider import VelocitySlider
 
 
 class Program(QWidget):
-    def __init__(self):
+    def __init__(self, application):
         super().__init__()
+        self.application = application
         self.setWindowTitle("Projectile Motion Simulation")
         self.background_image = load_image('background.png')
         self.wall_image = load_image('wall.png')
         self.velocity_arrow = load_image('velocity_arrow.png')
         self.acceleration_arrow = load_image('acceleration_arrow.png')
 
-        self.setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT)
+
+        self.setFixedSize(self.application.primaryScreen().availableGeometry().width(), self.application.primaryScreen().availableGeometry().height())
         self.setStyleSheet("""
             QLabel{
                 font-family: Arial;
@@ -49,11 +51,11 @@ class Program(QWidget):
         self.target_position_label = TargetLabel(self)
 
         self.fire_button = FireButton(self)
-        self.fire_button.move(FIRE_BUTTON_X, GROUND_Y)
+        self.fire_button.move(FIRE_BUTTON_X, self.height() - GROUND_HEIGHT)
         self.fire_button.clicked.connect(self.fire_cannon)
 
         self.controlling_frame = QFrame(self)
-        self.controlling_frame.move(CONTROLLING_FRAME_X, CONTROLLING_FRAME_Y)
+        self.controlling_frame.move(CONTROLLING_FRAME_X, self.height() - GROUND_HEIGHT)
 
         controlling_layout = QGridLayout()
         controlling_layout.setContentsMargins(75, 30, 0, 0)
@@ -147,7 +149,7 @@ class Program(QWidget):
             settings_layout.addWidget(button)
 
         self.settings_menu.setLayout(settings_layout)
-        self.settings_menu.move(WINDOW_WIDTH - self.settings_menu.width() - 150, 50)
+        self.settings_menu.move(self.width() - self.settings_menu.width() - 150, 50)
 
     def update_frame(self):
         if not self.settings.paused and self.settings.time < self.settings.max_time:
@@ -317,23 +319,23 @@ class Program(QWidget):
     def paintEvent(self, event, **kwargs):
         self.update()
         painter = QPainter(self)
-        wall = self.wall_image.scaled(WALL_WIDTH, WINDOW_HEIGHT, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
-        background = self.background_image.scaled(WINDOW_WIDTH - WALL_WIDTH, WINDOW_HEIGHT - GROUND_HEIGHT, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
+        wall = self.wall_image.scaled(WALL_WIDTH, self.height(), Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
+        background = self.background_image.scaled(self.width() - WALL_WIDTH, self.height() - GROUND_HEIGHT, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
         painter.drawPixmap(0, 0, wall)
         painter.drawPixmap(WALL_WIDTH, 0, background)
 
-        vertical_shaft_gradient = QLinearGradient(WALL_WIDTH, GROUND_Y, WALL_WIDTH + CANNON_WIDTH + 50, GROUND_Y)
+        vertical_shaft_gradient = QLinearGradient(WALL_WIDTH, self.height() - GROUND_HEIGHT, WALL_WIDTH + CANNON_WIDTH + 50, self.height() - GROUND_HEIGHT)
         vertical_shaft_gradient.setColorAt(0.0, QColor(*VERTICAL_SHAFT_EDGE_COLOR))
         vertical_shaft_gradient.setColorAt(0.5, QColor(*VERTICAL_SHAFT_MIDDLE_COLOR))
         vertical_shaft_gradient.setColorAt(1.0, QColor(*VERTICAL_SHAFT_EDGE_COLOR))
         vertical_shaft_brush = QBrush(vertical_shaft_gradient)
-        painter.fillRect(WALL_WIDTH, GROUND_Y, CANNON_WIDTH + 50, GROUND_HEIGHT, vertical_shaft_brush)
+        painter.fillRect(WALL_WIDTH, self.height() - GROUND_HEIGHT, CANNON_WIDTH + 50, GROUND_HEIGHT, vertical_shaft_brush)
 
-        ground_gradient = QLinearGradient(0, GROUND_Y, 0, WINDOW_HEIGHT)
+        ground_gradient = QLinearGradient(0, self.height() - GROUND_HEIGHT, 0, self.height())
         ground_gradient.setColorAt(0.0, QColor(*GROUND_TOP_COLOR))
         ground_gradient.setColorAt(1.0, QColor(*GROUND_BOTTOM_COLOR))
         ground_brush = QBrush(ground_gradient)
-        painter.fillRect(WALL_WIDTH + CANNON_WIDTH + 50, GROUND_Y, WINDOW_WIDTH, GROUND_HEIGHT, ground_brush)
+        painter.fillRect(WALL_WIDTH + CANNON_WIDTH + 50, self.height() - GROUND_HEIGHT, self.width(), GROUND_HEIGHT, ground_brush)
 
         for cannonball in self.cannonballs:
             if self.settings.showing_trajectory:
@@ -341,7 +343,7 @@ class Program(QWidget):
                              range(0, cannonball.time_index + 1, 5)]
                 positions.append((cannonball.data_lists['x'][cannonball.time_index], cannonball.data_lists['y'][cannonball.time_index]))
                 points = QPolygon([QPoint(int(position[0] * PIXELS_PER_METRE + WALL_WIDTH + CANNON_WIDTH),
-                                          int(GROUND_Y - position[1] * PIXELS_PER_METRE)) for position in positions])
+                                          int(self.height() - GROUND_HEIGHT - position[1] * PIXELS_PER_METRE)) for position in positions])
                 painter.setRenderHint(QPainter.Antialiasing)
                 painter.setPen(QPen(Qt.red if cannonball.air_resistance_enabled else Qt.blue, 3))
                 painter.drawPolyline(points)
@@ -402,6 +404,6 @@ class Program(QWidget):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = Program()
-    window.show()
+    window = Program(app)
+    window.showMaximized()
     sys.exit(app.exec_())
