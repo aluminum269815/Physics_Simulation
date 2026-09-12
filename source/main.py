@@ -155,6 +155,7 @@ class Program(QWidget):
         if not self.settings.paused and self.settings.time < self.settings.max_time:
             self.settings.time = round(self.settings.time + FRAME_INTERVAL * self.settings.playing_speed, 4)
             self.update_cannonballs()
+            self.target.update_image()
             self.timeline.update_value()
             self.time_input.update_value()
             self.setting_windows['Cannonball Details'].update_information()
@@ -168,6 +169,7 @@ class Program(QWidget):
             self.selecting_cannonball.deselect()
             self.selecting_cannonball = None
             self.delete_button.setEnabled(False)
+            self.target.update_image()
             self.setting_windows['Cannonball Details'].update_information()
             self.selection_label.setText(f'{len(self.cannonballs)} cannonball(s) in total.' if len(self.cannonballs) > 0 else 'There is no cannonball.')
 
@@ -184,6 +186,7 @@ class Program(QWidget):
         self.update_cannonballs()
         self.timeline.update_value()
         self.time_input.update_value()
+        self.target.update_image()
         self.setting_windows['Cannonball Details'].update_information()
 
     def change_cannon_height(self, height):
@@ -231,6 +234,7 @@ class Program(QWidget):
     def reset(self):
         self.clear()
         self.settings.reset()
+        self.target.update_image()
         self.timeline.update_value()
         self.time_input.update_value()
         self.velocity_slider.update_value()
@@ -300,6 +304,7 @@ class Program(QWidget):
         deleting_cannonball.deleteLater()
         self.update_min_time()
         self.update_max_time()
+        self.target.update_image()
         self.setting_windows['Cannonball Details'].update_information()
         if len(self.cannonballs) > 0:
             self.select_offset_cannonball(-1)

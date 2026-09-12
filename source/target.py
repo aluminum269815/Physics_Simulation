@@ -1,3 +1,4 @@
+import math
 import os
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
@@ -13,11 +14,11 @@ class Target(QLabel):
         self.program = program
         self.settings = program.settings
 
-        image = load_image('target.png')
-        image = image.scaled(100, 100, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        self.default_image = load_image('target_default.png').scaled(100, 100, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        self.hit_image = load_image('target_hit.png').scaled(100, 100, Qt.KeepAspectRatio, Qt.SmoothTransformation)
 
-        self.setPixmap(image)
-        self.setFixedSize(image.size())
+        self.setPixmap(self.default_image)
+        self.setFixedSize(self.default_image.size())
         self.setStyleSheet("background: transparent")
         self.setCursor(Qt.OpenHandCursor)
 
@@ -39,6 +40,7 @@ class Target(QLabel):
             self.settings.set_target_position(self.settings.target_distance + distance_change, self.settings.target_height + height_change)
             self.drag_position = event.globalPos()
             self.update_position()
+            self.update_image()
             self.program.target_position_label.update_position()
 
     def mouseReleaseEvent(self, event, **kwargs):
@@ -50,6 +52,16 @@ class Target(QLabel):
         x = WALL_WIDTH + CANNON_WIDTH + self.settings.target_distance * PIXELS_PER_METRE - self.width() // 2
         y = self.program.height() - GROUND_HEIGHT - self.settings.target_height * PIXELS_PER_METRE - self.height() // 2
         self.move(int(x), int(y))
+
+    def update_image(self):
+        for cannonball in self.program.cannonballs:
+            x_distance = self.x() + self.width() // 2 - (cannonball.x() + cannonball.width() // 2)
+            y_distance = self.y() + self.height() // 2 - (cannonball.y() + cannonball.height() // 2)
+            if math.sqrt(x_distance ** 2 + y_distance ** 2) <= 50:
+                self.setPixmap(self.hit_image)
+                return
+
+        self.setPixmap(self.default_image)
 
 
 class TargetLabel(QLabel):
